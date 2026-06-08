@@ -1,0 +1,75 @@
+Please fix two issues in the subcontract module:
+
+BUG 1 — Empty screen after subcontractor login:
+When a subcontractor user logs in (role: 
+subcontratista), the screen is blank after 
+authentication. 
+
+Please fix:
+1. After successful login as subcontratista,
+   navigate to the subcontracts project list
+2. The project list must query 
+   subcontratos_proyectos where:
+   usuario_id = logged in user's id
+   OR empresa_id = logged in user's empresa_id
+3. If no projects are assigned yet, show a 
+   friendly empty state:
+   "No tienes proyectos asignados aún.
+   Tu supervisor te notificará cuando 
+   tengas un proyecto activo."
+   With a construction/waiting illustration
+4. Test with user "roberto.flores" and 
+   confirm projects appear after login
+
+Also check:
+- Is the empresa_id being passed correctly 
+  in the auth response for subcontratistas?
+- Is the project list query using the 
+  correct user id or empresa_id?
+- Add console.logs to trace the issue
+
+BUG 2 — Add personal management in 
+subcontractor app:
+Add a "+" icon button in the top right 
+of the subcontractor home/projects screen 
+header for managing their workers.
+
+ICON BUTTON:
+- Icon: person with "+" symbol 👤+
+- Position: top right of header
+- Background: #CC0000 red circle
+- Size: 36px x 36px
+
+WHEN TAPPED — open a modal "Mi Personal":
+HEADER: "👥 Mi Personal"
+Close button top right
+
+CONTENT:
+1. List of registered workers for this company
+   Query subcontratos_tecnicos where 
+   empresa_id = logged in user's empresa_id
+   
+   Each worker shown as a card:
+   - Name
+   - Status: Activo (green) / Inactivo (gray)
+   - Toggle to activate/deactivate
+
+2. "➕ Agregar trabajador" button at bottom
+   Opens an inline form:
+   - Name field (required)
+   - Save button
+   On save:
+   - Insert into subcontratos_tecnicos with
+     empresa_id from logged in user
+   - New worker appears immediately in list
+   - Worker is available in daily report 
+     technician dropdown
+
+3. When selecting technicians in daily report,
+   this list is the source — subcontractor 
+   manages their own team from here
+
+NAVIGATION:
+- Modal opens over the projects list
+- Closing returns to projects list
+- No access to TAS dashboard or any other area

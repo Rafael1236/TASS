@@ -1,0 +1,901 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: dashboard
+    description: Operations dashboard for supervisors
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /dashboard/kpis:
+    get:
+      operationId: getDashboardKpis
+      tags: [dashboard]
+      summary: KPI summary cards
+      description: Returns aggregated KPIs for the selected date range
+      parameters:
+        - name: date_range
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, custom]
+            default: today
+        - name: from
+          in: query
+          schema:
+            type: string
+            description: ISO date string for custom range start
+        - name: to
+          in: query
+          schema:
+            type: string
+            description: ISO date string for custom range end
+      responses:
+        "200":
+          description: KPI data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardKpis"
+
+  /dashboard/reports:
+    get:
+      operationId: getDashboardReports
+      tags: [dashboard]
+      summary: Filtered reports list
+      description: Returns list of service reports with optional filters
+      parameters:
+        - name: date_range
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, custom]
+            default: week
+        - name: from
+          in: query
+          schema:
+            type: string
+        - name: to
+          in: query
+          schema:
+            type: string
+        - name: tecnico
+          in: query
+          schema:
+            type: string
+        - name: cliente
+          in: query
+          schema:
+            type: string
+        - name: estado
+          in: query
+          schema:
+            type: string
+        - name: tipo_servicio
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Reports list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardReportsResponse"
+
+  /dashboard/technicians:
+    get:
+      operationId: getDashboardTechnicians
+      tags: [dashboard]
+      summary: Technician performance summary
+      description: Returns per-technician aggregated stats for the selected date range
+      parameters:
+        - name: date_range
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, custom]
+            default: week
+        - name: from
+          in: query
+          schema:
+            type: string
+        - name: to
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Technician summary list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardTechniciansResponse"
+
+  /dashboard/chart:
+    get:
+      operationId: getDashboardChart
+      tags: [dashboard]
+      summary: Hours worked per technician (bar chart data)
+      description: Returns data suitable for a bar chart of hours worked per technician
+      parameters:
+        - name: date_range
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, custom]
+            default: week
+        - name: from
+          in: query
+          schema:
+            type: string
+        - name: to
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Chart data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardChartResponse"
+
+  /dashboard/charts:
+    get:
+      operationId: getDashboardCharts
+      tags: [dashboard]
+      summary: All chart data in one request
+      parameters:
+        - name: date_range
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, custom]
+            default: week
+        - name: from
+          in: query
+          schema:
+            type: string
+        - name: to
+          in: query
+          schema:
+            type: string
+        - name: tecnico
+          in: query
+          schema:
+            type: string
+        - name: cliente
+          in: query
+          schema:
+            type: string
+        - name: estado
+          in: query
+          schema:
+            type: string
+        - name: tipo_servicio
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: All chart datasets
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardChartsData"
+
+  /dashboard/chat:
+    post:
+      operationId: postDashboardChat
+      tags: [dashboard]
+      summary: AI assistant for supervisor
+      description: Answers natural-language questions about reports data using Claude
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DashboardChatRequest"
+      responses:
+        "200":
+          description: AI answer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardChatResponse"
+
+  /dashboard/filters:
+    get:
+      operationId: getDashboardFilters
+      tags: [dashboard]
+      summary: Dynamic filter options
+      description: Returns distinct values for each filter dropdown, scoped to the date range
+      parameters:
+        - name: date_range
+          in: query
+          schema:
+            type: string
+            enum: [today, week, month, custom]
+            default: week
+        - name: from
+          in: query
+          schema:
+            type: string
+        - name: to
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Filter option lists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardFilterOptions"
+
+  /reports/by-call:
+    get:
+      operationId: getReportsByCall
+      tags: [dashboard]
+      summary: Full report data for a SAP call number
+      description: Returns all boletas, technicians, materials and summary for a given SAP call number
+      parameters:
+        - name: numero
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Call report data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CallReportResponse"
+        "404":
+          description: No reports found for this call number
+
+  /comercial/kpis:
+    get:
+      operationId: getComercialKpis
+      tags: [comercial]
+      summary: Commercial dashboard KPIs
+      parameters:
+        - { name: date_range, in: query, schema: { type: string, enum: [today, week, month, custom] } }
+        - { name: from, in: query, schema: { type: string } }
+        - { name: to, in: query, schema: { type: string } }
+        - { name: vendedor, in: query, schema: { type: string } }
+        - { name: estado, in: query, schema: { type: string } }
+        - { name: cliente, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: KPIs
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ComercialKpis" }
+
+  /comercial/reports:
+    get:
+      operationId: getComercialReports
+      tags: [comercial]
+      summary: Quotation opportunities table
+      parameters:
+        - { name: date_range, in: query, schema: { type: string } }
+        - { name: from, in: query, schema: { type: string } }
+        - { name: to, in: query, schema: { type: string } }
+        - { name: vendedor, in: query, schema: { type: string } }
+        - { name: estado, in: query, schema: { type: string } }
+        - { name: cliente, in: query, schema: { type: string } }
+        - { name: tecnico, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: Reports list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ComercialReportsResponse" }
+
+  /comercial/report/{id}:
+    patch:
+      operationId: patchComercialReport
+      tags: [comercial]
+      summary: Update quotation status
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ComercialUpdateBody" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                required: [ok]
+
+  /comercial/charts:
+    get:
+      operationId: getComercialCharts
+      tags: [comercial]
+      summary: All commercial chart datasets
+      parameters:
+        - { name: date_range, in: query, schema: { type: string } }
+        - { name: from, in: query, schema: { type: string } }
+        - { name: to, in: query, schema: { type: string } }
+        - { name: vendedor, in: query, schema: { type: string } }
+        - { name: estado, in: query, schema: { type: string } }
+        - { name: cliente, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: Chart data
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ComercialChartsData" }
+
+  /comercial/vendedores:
+    get:
+      operationId: getComercialVendedores
+      tags: [comercial]
+      summary: Salesperson KPI table
+      parameters:
+        - { name: date_range, in: query, schema: { type: string } }
+        - { name: from, in: query, schema: { type: string } }
+        - { name: to, in: query, schema: { type: string } }
+        - { name: estado, in: query, schema: { type: string } }
+        - { name: cliente, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: Vendedores list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ComercialVendedoresResponse" }
+
+  /comercial/chat:
+    post:
+      operationId: postComercialChat
+      tags: [comercial]
+      summary: Commercial AI assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DashboardChatRequest" }
+      responses:
+        "200":
+          description: AI answer
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardChatResponse" }
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    DashboardKpis:
+      type: object
+      properties:
+        reports_today:
+          type: integer
+        reports_week:
+          type: integer
+        hours_worked_today:
+          type: number
+          description: Sum of hours worked by all technicians today
+        hours_worked_week:
+          type: number
+          description: Sum of hours worked by all technicians this week
+        pending_quotations:
+          type: integer
+          description: Reports where hay_cotizacion is true
+        avg_nps:
+          type: number
+          nullable: true
+          description: Average NPS score; null if no data
+      required:
+        - reports_today
+        - reports_week
+        - hours_worked_today
+        - hours_worked_week
+        - pending_quotations
+        - avg_nps
+
+    DashboardReport:
+      type: object
+      properties:
+        id:
+          type: string
+        numero_reporte:
+          type: integer
+        created_at:
+          type: string
+        tecnico_nombre:
+          type: string
+          nullable: true
+        cliente_nombre:
+          type: string
+        tipo_servicio:
+          type: string
+          nullable: true
+        trabajo_realizado:
+          type: string
+          nullable: true
+        hora_entrada:
+          type: string
+          nullable: true
+        hora_salida:
+          type: string
+          nullable: true
+        horas_trabajadas:
+          type: number
+          nullable: true
+        estado_servicio:
+          type: string
+          nullable: true
+        hay_cotizacion:
+          type: boolean
+          nullable: true
+        descripcion_cotizacion:
+          type: string
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+        nps:
+          type: number
+          nullable: true
+        placa_vehiculo:
+          type: string
+          nullable: true
+      required:
+        - id
+        - numero_reporte
+        - created_at
+        - cliente_nombre
+
+    DashboardReportsResponse:
+      type: object
+      properties:
+        reports:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardReport"
+        total:
+          type: integer
+      required:
+        - reports
+        - total
+
+    DashboardTechnician:
+      type: object
+      properties:
+        tecnico_nombre:
+          type: string
+        visits:
+          type: integer
+        hours_worked:
+          type: number
+        avg_nps:
+          type: number
+          nullable: true
+        pending_quotations:
+          type: integer
+      required:
+        - tecnico_nombre
+        - visits
+        - hours_worked
+        - pending_quotations
+
+    DashboardTechniciansResponse:
+      type: object
+      properties:
+        technicians:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardTechnician"
+      required:
+        - technicians
+
+    DashboardChartEntry:
+      type: object
+      properties:
+        tecnico_nombre:
+          type: string
+        hours_worked:
+          type: number
+        visits:
+          type: integer
+      required:
+        - tecnico_nombre
+        - hours_worked
+        - visits
+
+    DashboardChartResponse:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardChartEntry"
+      required:
+        - entries
+
+    DashboardChartsData:
+      type: object
+      properties:
+        reportesPorTecnico:
+          type: array
+          items:
+            type: object
+            properties:
+              nombre: { type: string }
+              reportes: { type: integer }
+            required: [nombre, reportes]
+        horasPorTecnico:
+          type: array
+          items:
+            type: object
+            properties:
+              nombre: { type: string }
+              horas: { type: number }
+            required: [nombre, horas]
+        porTipoServicio:
+          type: array
+          items:
+            type: object
+            properties:
+              tipo: { type: string }
+              reportes: { type: integer }
+              pct: { type: number }
+            required: [tipo, reportes, pct]
+        porEstado:
+          type: array
+          items:
+            type: object
+            properties:
+              estado: { type: string }
+              reportes: { type: integer }
+              pct: { type: number }
+            required: [estado, reportes, pct]
+        porDia:
+          type: array
+          items:
+            type: object
+            properties:
+              dia: { type: string }
+              fecha: { type: string }
+              reportes: { type: integer }
+            required: [dia, fecha, reportes]
+      required:
+        - reportesPorTecnico
+        - horasPorTecnico
+        - porTipoServicio
+        - porEstado
+        - porDia
+
+    DashboardChatMessage:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+      required:
+        - role
+        - content
+
+    DashboardChatRequest:
+      type: object
+      properties:
+        message:
+          type: string
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardChatMessage"
+      required:
+        - message
+
+    DashboardChatResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+      required:
+        - answer
+
+    DashboardFilterOptions:
+      type: object
+      properties:
+        tecnicos:
+          type: array
+          items:
+            type: string
+        clientes:
+          type: array
+          items:
+            type: string
+        estados:
+          type: array
+          items:
+            type: string
+        tipos_servicio:
+          type: array
+          items:
+            type: string
+      required: [tecnicos, clientes, estados, tipos_servicio]
+
+    CallReportBoleta:
+      type: object
+      properties:
+        id:
+          type: string
+        numero_reporte:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          nullable: true
+        tecnico_nombre:
+          type: string
+          nullable: true
+        cliente_nombre:
+          type: string
+        numero_proyecto:
+          type: string
+          nullable: true
+        tipo_servicio:
+          type: string
+          nullable: true
+        trabajo_realizado:
+          type: string
+          nullable: true
+        hora_entrada:
+          type: string
+          nullable: true
+        hora_salida:
+          type: string
+          nullable: true
+        horas_trabajadas:
+          type: number
+          nullable: true
+        estado_servicio:
+          type: string
+          nullable: true
+        hay_cotizacion:
+          type: boolean
+          nullable: true
+        descripcion_cotizacion:
+          type: string
+          nullable: true
+        observaciones:
+          type: string
+          nullable: true
+        placa_vehiculo:
+          type: string
+          nullable: true
+        es_subcontrato:
+          type: boolean
+          nullable: true
+        empresa_subcontrato:
+          type: string
+          nullable: true
+        cantidad_personas_subcontrato:
+          type: number
+          nullable: true
+        fotos:
+          type: array
+          items:
+            type: string
+        firma_cliente_url:
+          type: string
+          nullable: true
+        tecnicos:
+          type: array
+          items:
+            type: object
+            properties:
+              nombre: { type: string }
+              es_subcontrato: { type: boolean }
+            required: [nombre, es_subcontrato]
+        repuestos:
+          type: array
+          items:
+            type: object
+            properties:
+              cantidad: { type: string, nullable: true }
+              descripcion: { type: string }
+            required: [descripcion]
+      required: [id, cliente_nombre, fotos, tecnicos, repuestos]
+
+    CallReportResponse:
+      type: object
+      properties:
+        numero_llamada:
+          type: string
+        boletas:
+          type: array
+          items:
+            $ref: "#/components/schemas/CallReportBoleta"
+        total_boletas:
+          type: integer
+        fecha_primera:
+          type: string
+          nullable: true
+        fecha_ultima:
+          type: string
+          nullable: true
+        total_horas:
+          type: number
+        tecnicos_involucrados:
+          type: array
+          items:
+            type: string
+        todos_repuestos:
+          type: array
+          items:
+            type: string
+      required:
+        - numero_llamada
+        - boletas
+        - total_boletas
+        - total_horas
+        - tecnicos_involucrados
+        - todos_repuestos
+
+    ComercialKpis:
+      type: object
+      properties:
+        total: { type: integer }
+        enviadas: { type: integer }
+        no_enviadas: { type: integer }
+        pendientes: { type: integer }
+        conversion_rate: { type: number }
+        avg_response_times:
+          type: array
+          items:
+            type: object
+            properties:
+              vendedor: { type: string }
+              avg_hours: { type: number }
+            required: [vendedor, avg_hours]
+      required: [total, enviadas, no_enviadas, pendientes, conversion_rate, avg_response_times]
+
+    ComercialReport:
+      type: object
+      properties:
+        id: {}
+        numero_reporte: {}
+        created_at: { type: string, nullable: true }
+        tecnico_nombre: { type: string, nullable: true }
+        cliente_nombre: { type: string }
+        trabajo_realizado: { type: string, nullable: true }
+        descripcion_cotizacion: { type: string, nullable: true }
+        cotizacion_estado: { type: string }
+        cotizacion_enviada_at: { type: string, nullable: true }
+        cotizacion_vendedor: { type: string, nullable: true }
+        cotizacion_motivo_no_envio: { type: string, nullable: true }
+        correo_comercial_enviado_at: { type: string, nullable: true }
+        elapsed_hours: { type: number, nullable: true }
+        response_hours: { type: number, nullable: true }
+      required: [id, numero_reporte, cliente_nombre, cotizacion_estado]
+
+    ComercialReportsResponse:
+      type: object
+      properties:
+        reports:
+          type: array
+          items: { $ref: "#/components/schemas/ComercialReport" }
+        total: { type: integer }
+      required: [reports, total]
+
+    ComercialUpdateBody:
+      type: object
+      properties:
+        cotizacion_estado:
+          type: string
+          enum: [enviada, no_enviada]
+        cotizacion_vendedor: { type: string }
+        cotizacion_motivo_no_envio: { type: string }
+      required: [cotizacion_estado]
+
+    ComercialChartsData:
+      type: object
+      properties:
+        porEstado:
+          type: array
+          items:
+            type: object
+            properties:
+              estado: { type: string }
+              value: { type: integer }
+              color: { type: string }
+            required: [estado, value, color]
+        porVendedor:
+          type: array
+          items:
+            type: object
+            properties:
+              nombre: { type: string }
+              enviadas: { type: integer }
+              no_enviadas: { type: integer }
+              pendientes: { type: integer }
+            required: [nombre, enviadas, no_enviadas, pendientes]
+        tiempoVendedor:
+          type: array
+          items:
+            type: object
+            properties:
+              nombre: { type: string }
+              avg_horas: { type: number }
+            required: [nombre, avg_horas]
+        topClientes:
+          type: array
+          items:
+            type: object
+            properties:
+              cliente: { type: string }
+              oportunidades: { type: integer }
+            required: [cliente, oportunidades]
+      required: [porEstado, porVendedor, tiempoVendedor, topClientes]
+
+    ComercialVendedor:
+      type: object
+      properties:
+        nombre: { type: string }
+        total: { type: integer }
+        enviadas: { type: integer }
+        no_enviadas: { type: integer }
+        pendientes: { type: integer }
+        tasa: { type: number }
+        avg_horas: { type: number, nullable: true }
+      required: [nombre, total, enviadas, no_enviadas, pendientes, tasa]
+
+    ComercialVendedoresResponse:
+      type: object
+      properties:
+        vendedores:
+          type: array
+          items: { $ref: "#/components/schemas/ComercialVendedor" }
+      required: [vendedores]

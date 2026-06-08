@@ -1,0 +1,140 @@
+Please update the supervisor dashboard to show 
+ONLY their own data with meaningful KPIs and 
+performance metrics.
+
+SUPERVISOR DASHBOARD STRUCTURE:
+
+SECTION 1 — Personal KPI Cards (top row):
+All filtered to logged-in supervisor only:
+
+Row 1 — Activity KPIs:
+- "📋 Boletas hoy" — count for today
+- "📋 Boletas esta semana" — count this week
+- "📋 Boletas este mes" — count this month
+- "⏳ Pendientes de revisión" — red if > 0
+
+Row 2 — Performance KPIs:
+- "⏱️ Mi tiempo promedio de revisión"
+  Average minutes from boleta created_at 
+  to revisado_at for their boletas
+  Color: green < 30min, amber 30-60min, 
+  red > 60min
+- "♻️ Reprocesos este mes"
+  Count of es_reproceso = true for 
+  boletas assigned to them
+- "🏗️ Subcontratos activos"
+  Count of active projects assigned to them
+- "⏳ Aprobaciones subcontrato pendientes"
+  Count pending subcontract reports
+
+SECTION 2 — Boletas pendientes de revisión:
+Title: "📋 Mis Boletas Pendientes"
+Date range filter (default: today)
+Only boletas where supervisor_id = my id
+AND estado_revision = 'pendiente_revision' 
+OR 'pendiente_llamada'
+
+Each card shows full detail including 
+technician hours section.
+Action buttons: Boleta revisada / 
+Falta # llamada / Reproceso checkbox
+
+SECTION 3 — Mi rendimiento:
+Title: "📊 Mi Rendimiento"
+
+Chart 1 — Bar chart: Boletas revisadas 
+por día esta semana
+X axis: Mon-Fri
+Y axis: count of boletas reviewed each day
+Color: #CC0000
+
+Chart 2 — Line chart: Tiempo promedio 
+de revisión por día esta semana
+Shows trend of how fast they review boletas
+Target line at 30 minutes
+
+SECTION 4 — Reprocesos de mis boletas:
+Title: "♻️ Reprocesos"
+
+Table:
+- Técnico
+- # Llamada (clickable → full report)
+- Cliente
+- Fecha
+- Tipo de servicio
+- Descripción (truncated)
+
+If no reprocesos: show green message
+"✅ Sin reprocesos en el período seleccionado"
+
+SECTION 5 — Mis técnicos:
+Title: "👥 Actividad de Mis Técnicos"
+
+Table showing technicians who have submitted 
+boletas assigned to this supervisor:
+Columns:
+- Técnico
+- Departamento
+- Boletas este mes
+- Horas trabajadas este mes
+- Reprocesos
+- Última boleta (date)
+- Estado última boleta (badge)
+
+Click on technician row → expand to show 
+their last 5 boletas with dates and status
+
+SECTION 6 — Horas trabajadas:
+Title: "⏱️ Horas de Mi Equipo"
+
+Date range filter
+Bar chart: hours per technician
+Table: Técnico, Total horas, # Boletas, 
+Promedio horas por boleta
+
+SECTION 7 — Mis subcontratos:
+Title: "🏗️ Mis Subcontratos"
+
+Only projects where supervisor_id = my id
+
+Subsection A — Pendientes de aprobación:
+Cards for each pending subcontract report
+Full detail with approve/reject buttons
+Live timer since report was submitted
+
+Subsection B — Proyectos activos:
+Project cards with:
+- Project name and client
+- Days counter (business days)
+- Activities progress bars
+- Last report date
+- Click to see full timeline
+
+Subsection C — Proyectos por iniciar:
+Upcoming projects with countdown
+
+SECTION 8 — Resumen del período:
+Title: "📈 Mi Resumen"
+Date range selector
+
+Summary stats:
+- Total boletas revisadas
+- Total boletas con reproceso
+- % reproceso rate
+- Tiempo promedio de revisión
+- Total horas equipo registradas
+- Total subcontract reports approved
+- Total subcontract reports rejected
+
+Comparison vs previous period:
+"↑ 15% más boletas que la semana pasada"
+"↓ 5min más rápido que el mes pasado"
+
+GENERAL:
+- All sections respect the logged-in 
+  supervisor's id filter
+- No data from other supervisors visible
+- Date range filter at top affects all sections
+- "Restablecer filtros" button
+- Replace all "reporte/reportes" with 
+  "boleta/boletas" except in document titles

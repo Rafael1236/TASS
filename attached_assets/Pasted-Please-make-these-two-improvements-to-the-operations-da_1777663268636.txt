@@ -1,0 +1,99 @@
+Please make these two improvements to the 
+operations dashboard:
+
+CHANGE 1 — Dynamic filter dropdowns:
+Convert all filter inputs to proper dropdowns 
+that load their options dynamically from Supabase:
+
+a. TÉCNICO dropdown:
+   - Query distinct tecnico_nombre from reportes
+   - Filter by current date range selection
+   - Sort alphabetically
+   - First option: "Todos los técnicos"
+
+b. CLIENTE dropdown:
+   - Query distinct cliente_nombre from reportes
+   - Filter by current date range selection
+   - Sort alphabetically
+   - First option: "Todos los clientes"
+
+c. ESTADO dropdown (already exists but improve):
+   - Query distinct estado_servicio from reportes
+   - Show only states that actually exist in data
+   - First option: "Todos los estados"
+
+d. TIPO DE SERVICIO dropdown:
+   - Query distinct tipo_servicio from reportes
+   - Note: tipo_servicio is an array field, 
+     so unnest and get distinct values
+   - Sort alphabetically
+   - First option: "Todos los tipos"
+
+All dropdowns must:
+- Reload their options when date range changes
+- Show a loading state while fetching
+- Update the reports table immediately on selection
+
+CHANGE 2 — Search by SAP call number:
+Add a prominent search bar at the top of the 
+dashboard (above the KPI cards) with a 
+magnifying glass icon and placeholder:
+"Buscar por número de llamada SAP..."
+
+BEHAVIOR:
+- As the user types, search reportes table 
+  for matching numero_llamada (partial match)
+- On Enter or search button click, generate 
+  a full detailed report for that call number
+
+REPORT VIEW (shown in dashboard):
+When a call number is searched, replace the 
+main dashboard content with a full detailed 
+report page showing:
+
+HEADER:
+- "Reporte de Llamada SAP #[numero_llamada]"
+- Total number of boletas found
+- Date range of visits
+- "← Volver al dashboard" button
+- "Descargar PDF" button
+
+FOR EACH BOLETA found, show a detailed card with:
+- Número de reporte y fecha
+- Técnico(s) que atendieron
+- Cliente y dirección
+- Número de proyecto
+- Tipo de servicio
+- Trabajo realizado (full text, not truncated)
+- Repuestos y materiales utilizados (full list)
+- Personal subcontratado (empresa, cantidad)
+- Hora entrada y hora salida
+- Tiempo total en sitio
+- Estado del servicio
+- Observaciones completas
+- Fotos adjuntas (thumbnails)
+- NPS del cliente si existe
+- Placa del vehículo
+
+SUMMARY SECTION at the bottom:
+- Total horas trabajadas en esta llamada
+- Total técnicos involucrados
+- Lista completa de todos los repuestos usados
+- Timeline visual de todas las visitas
+
+PDF GENERATION:
+When "Descargar PDF" is clicked:
+- Generate a professional PDF of the full report
+- Include TAS header with dark background #1A1A1A 
+  and red accent #CC0000
+- Include all boleta details formatted clearly
+- Include photo thumbnails if available
+- filename: "Reporte_Llamada_[numero]_[fecha].pdf"
+- Use puppeteer or html-pdf or jsPDF to generate
+
+Add new API endpoints:
+- GET /api/reports/by-call?numero=[llamada] 
+  Returns all reports + technicians + repuestos 
+  + photos for that call number
+- GET /api/reports/by-call/pdf?numero=[llamada]
+  Returns generated PDF file

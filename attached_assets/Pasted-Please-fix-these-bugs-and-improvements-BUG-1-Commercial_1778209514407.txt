@@ -1,0 +1,133 @@
+Please fix these bugs and improvements:
+
+BUG 1 — Commercial email not sending when 
+supervisor clicks "Falta # llamada":
+When supervisor clicks "⚠️ Falta # llamada" 
+button, an email must be sent to the commercial 
+area (TEST MODE: hpinaud@tas-seguridad.com).
+Check the button click handler and verify 
+the email trigger is firing correctly.
+Add console.log to confirm email is being sent.
+The email subject should be:
+"⚠️ Boleta sin # llamada — [cliente] — 
+Reporte #[numero]"
+
+BUG 2 — Reproceso table in supervisor dashboard:
+Add a new section in the supervisor dashboard:
+"♻️ Técnicos con Reprocesos"
+
+Show a table with:
+Columns: Técnico, # Llamada, Cliente, Fecha, 
+Tipo de servicio, Descripción (truncated)
+
+Filter: by date range (use existing filter)
+Only show reports where es_reproceso = true
+AND supervisor_id = logged-in supervisor
+
+Also add a KPI card at the top:
+"♻️ Reprocesos" — count for selected period
+Clicking the card scrolls to the table
+
+BUG 3 — Client name search missing:
+In the operations and commercial dashboards,
+add a search by client name that works as follows:
+- Text input with placeholder: 
+  "Buscar por nombre de cliente..."
+- As user types, show dropdown of matching 
+  clients from clientes table
+- When client selected, show list of SAP 
+  call numbers associated with that client
+- User selects a call number
+- Shows full consolidated report for that 
+  call number (existing logic)
+Place this search alongside the existing 
+SAP number search bar.
+
+BUG 4 — Time picker for technicians:
+Replace the current time input in the boleta 
+form (both for principal technician and 
+auxiliary technicians) with:
+- Hour selector: scrollable or dropdown 1-12
+- Minutes selector: 00, 15, 30, 45
+- AM/PM toggle button
+- Format display: "09:30 AM"
+- Convert to 24h format when saving to DB:
+  "09:30 AM" → "09:30"
+  "01:30 PM" → "13:30"
+Apply to: hora_entrada and hora_salida for 
+all technicians in the form.
+
+BUG 5 — Boleta detail card in supervisor 
+dashboard not showing complete info:
+Expand the boleta review card to show ALL fields:
+- Número de reporte y fecha
+- Técnico principal + hora entrada/salida
+- Cliente
+- Llamada SAP y número de proyecto
+- Tipo de servicio (all chips)
+- Trabajo realizado (FULL text, not truncated)
+- Equipos instalados (if filled)
+- Materiales y repuestos (full list)
+- Técnicos auxiliares (names + hours each)
+- Personal subcontratado (count)
+- Estado del servicio
+- ¿Hay cotización? + description if yes
+- Observaciones (full text)
+- Fotos (thumbnails with lightbox)
+- Firma del cliente (if captured)
+Add a "Ver completo / Ver menos" toggle 
+to expand/collapse the full detail.
+
+BUG 6 — Subcontract days counter must use 
+business days (Monday-Friday only):
+Update the days calculation for subcontract 
+projects:
+- Count only Monday to Friday
+- Exclude Saturdays and Sundays
+- Both fecha_inicio AND fecha_fin_estimada 
+  are INCLUSIVE in the count
+- dias_maximos should also be calculated 
+  in business days when auto-calculated 
+  from date range
+- Example: Monday to Friday = 5 business days
+  Monday to next Monday = 6 business days
+- Update all displays: 
+  "X de Y días hábiles"
+  "Z días hábiles restantes"
+
+BUG 7 — Subcontract assignment email must 
+go to subcontractor user email:
+When a project is assigned to a subcontractor,
+the notification email must be sent to:
+- The correo field of the assigned 
+  subcontratos_usuarios record
+- NOT a hardcoded email
+- In TEST MODE still redirect to 
+  hpinaud@tas-seguridad.com with banner
+  showing original recipient
+
+BUG 8 — Subcontractor app UI fixes:
+a. "Gestionar personal" (👤+) button is 
+   hidden below the fold. Move it to the 
+   header bar — top right, always visible, 
+   never scrolled out of view.
+
+b. "Nuevo reporte diario" button is covered 
+   by the white footer/cintillo. Fix by:
+   - Adding bottom padding to the scrollable 
+     content equal to footer height + 20px
+   - OR moving the button above the footer
+   - Button must always be fully visible 
+     and tappable
+
+BUG 9 — Audio button in subcontract 
+daily report form field 4:
+In the subcontract daily report form, 
+field 4 is "Descripción del trabajo".
+Add a 🎤 microphone button next to this 
+field identical to the one in the TAS 
+boleta form:
+- Tap mic → record audio
+- Whisper transcribes → text appears in field
+- User can edit after transcription
+- Same UI as the boleta form mic buttons

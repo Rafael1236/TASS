@@ -1,0 +1,198 @@
+Please build a complete role-based dashboard 
+system with login and three distinct dashboards.
+
+PART 1 — DASHBOARD LOGIN:
+Add a login screen at /dashboard that appears 
+before any dashboard content.
+
+LOGIN SCREEN:
+- Dark theme matching TAS brand
+- TAS logo centered at top
+- Title: "Panel de Gestión TAS"
+- Username and password fields
+- "Iniciar sesión" button in red #CC0000
+- No registration option
+
+AUTHENTICATION:
+POST /api/dashboard/auth/login
+1. Query dashboard_usuarios table where 
+   usuario = username AND activo = true
+2. Default password for all: "TAS2026!"
+3. Return:
+{
+  success: true,
+  usuario: {
+    id, nombre, usuario, correo, rol
+  }
+}
+4. Store session in localStorage
+5. Redirect based on rol:
+   - "admin" → operations dashboard 
+     with access to all tabs
+   - "gerente_operaciones" → operations 
+     dashboard
+   - "supervisor" → supervisor dashboard
+   - "gerente_comercial" → commercial 
+     dashboard
+
+PART 2 — NAVIGATION STRUCTURE:
+Top navbar shows different tabs based on role:
+
+ADMIN (hernan.pinaud):
+- Operaciones | Comercial | Subcontratos | 
+  Supervisión
+
+GERENTE_OPERACIONES (mario.chicas, 
+maribel.santos):
+- Operaciones | Subcontratos | Supervisión
+
+SUPERVISOR:
+- Mis Boletas | Mis Subcontratos
+
+GERENTE_COMERCIAL (allen.rosales):
+- Comercial | Reportes
+
+Show logged-in user name and logout button 
+in top right of navbar.
+
+PART 3 — SUPERVISOR DASHBOARD:
+URL: /dashboard/supervisor
+Only shows data assigned to logged-in supervisor.
+
+SECTION 1 — KPIs:
+- Boletas pendientes de revisión (my boletas)
+- Boletas revisadas hoy
+- Subcontratos activos asignados a mí
+- Promedio tiempo de revisión
+
+SECTION 2 — Boletas pendientes de revisión:
+Same review cards as existing but filtered 
+by supervisor_id = logged-in user id
+Each card shows:
+- Report details
+- Live timer
+- Reproceso checkbox
+- "✓ Boleta revisada" button
+- "⚠️ Falta # llamada" button if no SAP number
+
+SECTION 3 — Mis subcontratos:
+Projects where supervisor_nombre matches 
+logged-in supervisor
+Same view as existing subcontracts dashboard
+but filtered to their projects only
+Shows: project list, timelines, pending 
+approvals for their projects
+
+SECTION 4 — KPIs de mi equipo:
+- Boletas por técnico (their team)
+- Horas trabajadas por técnico
+- Reprocesos del período
+
+PART 4 — GERENTE DE OPERACIONES DASHBOARD:
+URL: /dashboard/operaciones
+Sees everything across all supervisors.
+
+SECTION 1 — KPIs consolidados:
+- Total boletas período
+- Boletas pendientes (all supervisors)
+- Reprocesos totales
+- Horas trabajadas total
+- Promedio tiempo revisión por supervisor
+
+SECTION 2 — Búsqueda de reportes:
+TWO SEARCH OPTIONS:
+
+A) Por número de llamada SAP:
+   Text input → shows all boletas AND 
+   subcontract reports for that call number
+   (existing logic)
+
+B) Por nombre de cliente:
+   Searchable dropdown from clientes table
+   → Shows list of SAP call numbers 
+     associated with that client
+   → User selects a call number
+   → Shows full consolidated report for 
+     that call number (same as SAP search)
+
+SECTION 3 — Supervisores overview:
+Table showing per supervisor:
+- Nombre supervisor
+- Boletas pendientes
+- Boletas revisadas hoy/semana
+- Promedio tiempo revisión
+- Subcontratos activos
+Click row → expand to see their pending 
+boletas and active subcontracts
+
+SECTION 4 — All reports table:
+Same as existing operations table but 
+with supervisor column added
+Filter by supervisor dropdown
+
+SECTION 5 — Subcontratos overview:
+All active subcontract projects across 
+all supervisors
+Days counter, progress, status
+
+SECTION 6 — Productivity charts:
+- Boletas por técnico (bar chart)
+- Boletas por supervisor (bar chart)
+- Reprocesos trend (line chart)
+- Horas trabajadas por área (bar chart)
+
+PART 5 — GERENTE COMERCIAL DASHBOARD:
+URL: /dashboard/comercial
+Updated version of existing commercial 
+dashboard with search capabilities.
+
+SECTION 1 — KPIs:
+- Total oportunidades período
+- Cotizaciones enviadas
+- Cotizaciones pendientes
+- Tasa de conversión %
+- Boletas sin # llamada pendientes
+- Tiempo promedio respuesta comercial
+
+SECTION 2 — Búsqueda de reportes:
+Same two search options as operations:
+
+A) Por número de llamada SAP:
+   Shows all boletas for that call number
+   with their cotización status
+
+B) Por nombre de cliente:
+   Shows client's call numbers → select 
+   one → see full report with cotización info
+
+SECTION 3 — Oportunidades pendientes:
+Existing commercial opportunities cards
+With action buttons: enviada / no enviada
+
+SECTION 4 — Boletas sin # llamada:
+Existing pending call number section
+With timer and input to enter SAP number
+
+SECTION 5 — Charts:
+- Conversion rate pie chart
+- Opportunities by client (bar)
+- Response time by period (line)
+- Reasons for not sending quotes (pie)
+
+PART 6 — PROTECT ALL DASHBOARD ROUTES:
+- If not logged in → redirect to /dashboard
+- If wrong role tries to access wrong 
+  dashboard → redirect to their correct one
+- Logout clears session and returns to login
+
+PART 7 — UPDATE BOLETA FORM:
+When technician fills the supervisor field,
+query dashboard_usuarios where 
+rol IN ('supervisor', 'gerente_operaciones', 
+'admin') AND activo = true
+Show as dropdown in the form.
+
+Also update the boleta save flow:
+Save supervisor_id from selected supervisor
+into reportes.supervisor_id field so boletas
+appear in the correct supervisor's dashboard.

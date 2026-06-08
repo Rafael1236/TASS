@@ -1,0 +1,98 @@
+Please build a separate commercial dashboard page 
+for the sales team at TAS El Salvador. 
+URL: /dashboard/comercial
+
+DESIGN:
+- Same TAS CORP dark theme as operations dashboard
+- Colors: #1A1A1A background, #CC0000 accent, 
+  #FFFFFF text, #2D2D2D cards
+
+SECTION 1 — KPI Cards:
+- Total quotation opportunities this month
+- Quotes sent (cotizacion_estado = 'enviada')
+- Quotes not sent (cotizacion_estado = 'no_enviada')
+- Pending (cotizacion_estado = 'pendiente')
+- Conversion rate % (sent / total opportunities)
+- Average response time per salesperson 
+  (time from correo_comercial_enviado_at to 
+  cotizacion_enviada_at in hours)
+
+SECTION 2 — Filters:
+- Filter by date range (today, week, month, custom)
+- Filter by salesperson (cotizacion_vendedor)
+- Filter by status (pendiente, enviada, no_enviada)
+- Filter by client
+
+SECTION 3 — Opportunities table:
+Columns: #Reporte, Fecha visita, Técnico, Cliente, 
+Trabajo realizado (truncated), Oportunidad de 
+cotización, Vendedor asignado, Tiempo transcurrido, 
+Estado (color badge)
+
+For each row show an ACTION BUTTON:
+- If cotizacion_estado = 'pendiente': 
+  Show two buttons "✓ Cotización enviada" (green) 
+  and "✗ No se enviará" (red)
+- If cotizacion_estado = 'enviada': 
+  Show green badge "Enviada" + timestamp
+- If cotizacion_estado = 'no_enviada': 
+  Show red badge "No enviada" + reason
+
+When salesperson clicks "✓ Cotización enviada":
+- Ask for salesperson name if not set
+- Record cotizacion_estado = 'enviada'
+- Record cotizacion_enviada_at = now()
+- Record cotizacion_vendedor = salesperson name
+- Update Supabase immediately
+
+When salesperson clicks "✗ No se enviará":
+- Show a modal asking for reason with these options
+  as chips plus free text:
+  "Cliente no interesado"
+  "Precio fuera de presupuesto" 
+  "Ya tiene proveedor"
+  "No hubo respuesta del cliente"
+  "Otro motivo"
+- Record cotizacion_estado = 'no_enviada'
+- Record cotizacion_motivo_no_envio = reason
+- Record cotizacion_vendedor = salesperson name
+- Update Supabase immediately
+
+SECTION 4 — Charts:
+Chart 1 — Pie: Conversion rate 
+(Enviadas vs No enviadas vs Pendientes)
+Colors: green/red/amber
+
+Chart 2 — Bar: Opportunities per salesperson
+showing sent vs not sent stacked
+
+Chart 3 — Bar: Average response time per 
+salesperson (in hours)
+
+Chart 4 — Bar: Top clients with most 
+quotation opportunities
+
+SECTION 5 — Salesperson KPI table:
+Columns: Vendedor, Total oportunidades, 
+Enviadas, No enviadas, Pendientes, 
+Tasa conversión %, Tiempo promedio respuesta
+
+SECTION 6 — AI Assistant bot:
+Same floating chat button as operations dashboard.
+The bot can answer questions like:
+- "¿Cuántas cotizaciones tiene pendientes Juan?"
+- "¿Cuál es mi tasa de conversión este mes?"
+- "¿Qué clientes tienen más oportunidades abiertas?"
+- "¿Por qué no se enviaron las últimas cotizaciones?"
+
+Also update the Resend email function so that 
+when Email 2 (commercial) is sent, it records 
+correo_comercial_enviado_at = now() in the 
+reportes table for that report.
+
+Add a navigation link between both dashboards:
+- Operations dashboard: link to "Vista Comercial"
+- Commercial dashboard: link to "Vista Operaciones"
+
+Connect to same Supabase secrets already configured.
+Give me the public URL when done.

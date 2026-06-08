@@ -1,0 +1,61 @@
+The extraction flow is broken and inconsistent. 
+Please do a complete rewrite of the message handling 
+pipeline from scratch with this exact logic:
+
+SINGLE PIPELINE FOR ALL INPUTS:
+Whether the technician types text, sends audio 
+(transcribed by Whisper), or taps a chip — ALL 
+inputs go through exactly the same pipeline:
+
+Step 1: Add input to accumulated transcript
+Step 2: Send full transcript to Claude /api/extract
+Step 3: Claude returns JSON with all fields it found
+Step 4: Merge extracted fields into report data
+Step 5: Determine next missing field to ask about
+Step 6: Ask only for that one missing field
+
+FIELD ORDER TO CHECK (in this exact order):
+1. tecnico_nombre - required
+2. cliente_nombre - required
+3. numero_llamada - required
+4. tipo_servicio - required, chips
+5. trabajo_realizado - required, min 10 chars
+6. estado_servicio - required, chips
+7. hora_entrada - optional, format HH:MM
+8. hora_salida - optional, format HH:MM
+9. numero_proyecto - optional
+10. reporte_repuestos - optional
+11. reporte_tecnicos - optional
+12. es_subcontrato - optional, only if 
+    reporte_tecnicos not empty, chips Sí/No
+13. hay_cotizacion - optional, chips Sí/No
+14. descripcion_cotizacion - optional, only if 
+    hay_cotizacion is true
+15. observaciones - optional
+
+SKIPPING RULES:
+- If Claude already extracted a field from the 
+  transcript, skip asking for it
+- For optional fields always show a chip 
+  "Omitir" so technician can skip quickly
+- If technician says "ninguno" or "no" for an 
+  optional field, mark it as intentionally empty 
+  and move to next field
+
+AUDIO SPECIFIC:
+- Transcribed audio text must go through Claude 
+  extractor BEFORE the bot responds
+- Show "Analizando..." while Claude processes
+- Never treat transcribed audio as plain text answer
+
+MODES:
+- Remove the Quick/Guided mode selection entirely
+- There is only ONE mode: smart extraction that 
+  fills what it can and asks for the rest
+- This is simpler, faster and less confusing
+
+After rewriting show me the new handleUserMessage 
+function and test it with this text:
+"Soy Felix Ulloa visité Banco Agrícola llamada 
+7890 hice instalación de cámara IP todo terminado 
+entré 2pm salí 3pm"

@@ -1,0 +1,72 @@
+Please make these two connected changes:
+
+CHANGE 1 — Add numero_llamada to subcontract 
+project form:
+In the project creation form in the subcontracts 
+dashboard, add a "Número de llamada SAP" field 
+in STEP 1 after the project name.
+- Text input, optional
+- Save to subcontratos_proyectos.numero_llamada
+- Same field can link this project to a TAS 
+  service report with the same call number
+
+CHANGE 2 — Update SAP call number search 
+report to include subcontract data:
+When a supervisor searches for a call number 
+in the operations dashboard, the consolidated 
+report must now show BOTH TAS boletas AND 
+subcontract reports for that call number.
+
+Update GET /api/reports/by-call?numero=[llamada] 
+to also query subcontratos_proyectos where 
+numero_llamada matches, then fetch all related:
+- subcontratos_reportes for that project
+- subcontratos_fotos for each report
+- subcontratos_actividades_proyecto progress
+
+REPORT LAYOUT for mixed call number results:
+
+HEADER:
+- "Reporte Llamada SAP #[numero]"
+- Summary pills: "[N] visitas TAS" and 
+  "[N] reportes subcontrato"
+- Total dates range
+- Export PDF button
+
+SECTION 1 — "Visitas Técnicas TAS":
+Same as existing boleta cards but with 
+a blue "TAS" badge on each card
+Show: tecnico, fecha, tipo servicio, 
+trabajo realizado, horas, estado, fotos, firma
+
+SECTION 2 — "Actividades Subcontrato":
+New section with different card style
+For each subcontract project found:
+  - Company name header with orange 
+    "SUBCONTRATO" badge
+  - Project name and assigned activities
+  - Overall progress bar
+  - List of daily reports:
+    Each report: fecha, tecnicos presentes,
+    actividad, % avance, estado (aprobado/
+    rechazado/pendiente), descripcion, fotos
+  - Days counter: X de Y días utilizados
+
+SECTION 3 — "Resumen ejecutivo":
+At the bottom, a combined summary:
+- Total visitas TAS
+- Total reportes subcontrato  
+- Total técnicos involucrados (TAS + subcontrato)
+- Actividades completadas vs pendientes
+- Timeline visual combining both TAS visits 
+  and subcontract reports in chronological order
+
+PDF EXPORT:
+Include both sections in the PDF with 
+clear visual separation between TAS and 
+subcontract content.
+
+Make sure the layout is clean and easy 
+to read — a manager should be able to 
+understand the full picture of a project 
+at a glance.

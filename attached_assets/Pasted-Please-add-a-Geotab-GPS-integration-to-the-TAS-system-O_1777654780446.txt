@@ -1,0 +1,69 @@
+Please add a Geotab GPS integration to the TAS system.
+
+OBJECTIVE:
+Query the MyGeotab API to get stop activity for 
+TAS El Salvador vehicles — specifically stops of 
+more than 5 minutes on any given day, with exact 
+location, arrival time, departure time and total 
+time at each stop.
+
+CREDENTIALS (already in Replit Secrets):
+- GEOTAB_DATABASE: arrendleasing
+- GEOTAB_USERNAME: hpinaud@tas-seguridad.com
+- GEOTAB_PASSWORD: SanFran2026
+
+VEHICLES TO TRACK:
+Only vehicles whose name contains "TAS El Salvador"
+Filter them from the full vehicle list automatically.
+
+API SETUP:
+1. Authenticate with MyGeotab JSON-RPC API at:
+   https://my.geotab.com/apiv1
+   Method: Authenticate with database, username, 
+   password to get a session credentials token.
+
+2. Get vehicle list filtered by "TAS El Salvador"
+   in the vehicle name.
+
+3. For a given date, get all stops (exceptions) 
+   where the vehicle was stationary for more 
+   than 5 minutes using the ExceptionEvent or 
+   LogRecord API calls.
+
+4. For each stop get:
+   - Vehicle name
+   - Arrival time (local El Salvador time UTC-6)
+   - Departure time
+   - Total time at stop in minutes
+   - GPS coordinates
+   - Reverse geocoded address (use Geotab's 
+     built-in reverse geocoding or Google Maps)
+
+NEW API ENDPOINT:
+POST /api/geotab/stops
+Body: { "date": "2026-04-29" }
+Returns array of stops:
+[{
+  "vehiculo": "SV - TAS El Salvador - 321729...",
+  "llegada": "09:15",
+  "salida": "10:45",
+  "duracion_minutos": 90,
+  "direccion": "83 Avenida Norte 634, San Salvador",
+  "latitud": 13.7034,
+  "longitud": -89.2182
+}]
+
+NEW DASHBOARD SECTION:
+Add a "GPS — Actividad del día" section to the 
+operations dashboard that:
+- Has a date picker (default: today)
+- Shows a table with all stops over 5 minutes 
+  for all TAS vehicles that day
+- Columns: Vehículo, Hora llegada, Hora salida, 
+  Tiempo en sitio, Dirección
+- Has a "Ver en mapa" button that opens Google 
+  Maps at those coordinates
+- Refreshes automatically every 5 minutes
+
+This helps supervisors correlate vehicle stops 
+with service reports submitted by technicians.

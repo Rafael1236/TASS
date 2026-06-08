@@ -1,0 +1,128 @@
+Please update the subcontracts section in the 
+supervisor dashboard with a focused view on 
+project progress, separated by company.
+
+SUBCONTRACTS SECTION REDESIGN 
+(supervisor dashboard only):
+
+SUBSECTION A — Summary alerts bar 
+(top, always visible):
+A horizontal strip with colored alert pills:
+
+🔴 "X proyectos en riesgo" (>80% días)
+🟡 "X proyectos prontos a terminar" 
+   (< 3 días hábiles restantes)
+🔵 "X proyectos por iniciar" 
+   (fecha_inicio in next 7 days)
+🟢 "X aprobaciones pendientes"
+⚪ "X proyectos completados este mes"
+
+Each pill is clickable and scrolls to 
+the relevant section below.
+
+SUBSECTION B — KPI Cards for subcontracts:
+(filtered to this supervisor's projects only)
+
+- Total proyectos activos
+- Promedio de avance general (% across 
+  all active projects)
+- Días promedio restantes
+- Total reportes pendientes de aprobación
+- Tiempo promedio de aprobación (mine)
+  "Apruebo en promedio en X horas"
+
+SUBSECTION C — Projects grouped by company:
+Title: "🏗️ Proyectos por Empresa"
+
+For each subcontractor company that has 
+projects assigned to this supervisor,
+show a COMPANY CARD:
+
+Company card header:
+- Company name (bold)
+- # Active projects
+- Overall progress % across all 
+  their projects (average)
+- # Pending approvals for this company
+
+Inside each company card, list their projects:
+
+PROJECT ROW for each project:
+- Project name
+- Client name
+- Status badge (color coded):
+  🔵 Por iniciar | 🟢 En progreso | 
+  🟡 En riesgo | 🔴 Vencido | ⚪ Completado
+- Days counter: "X de Y días hábiles"
+  Progress bar color coded
+- Activities mini progress:
+  Show each activity as a small pill:
+  "Canalizado ████░░ 80%"
+  "Cableado ██░░░░ 40%"
+  "Montaje ░░░░░░ 0%"
+- Last report date: "Último avance: hace X días"
+- Pending approvals badge (red if > 0):
+  "X pendientes de aprobación"
+- Expand button → shows full project 
+  timeline and pending approval cards
+
+SUBSECTION D — Pending approvals 
+(all companies combined):
+Title: "⏳ Aprobaciones Pendientes"
+Sorted by: oldest first (most urgent)
+
+Each approval card shows:
+- Company name + project name
+- Date submitted + live timer
+- Technicians present + count
+- Activities worked with % advance each
+- Work description (full)
+- Photos thumbnails
+- Check-in/out times
+- Days counter for the project
+- APPROVE ✓ / REJECT ✗ buttons
+
+After approving/rejecting:
+- Card disappears from pending list
+- Project progress updates immediately
+- Days counter updates if needed
+
+SUBSECTION E — Projects by status:
+
+"🔵 Por iniciar" section:
+- Project name, company, client
+- "Inicia en X días hábiles" countdown
+- Assigned activities list
+- Contact info of subcontractor
+
+"🟡 En riesgo / 🔴 Vencidos" section:
+- Highlighted in amber/red
+- Days over/remaining
+- Last activity date
+- Quick action: "Contactar subcontratista" 
+  button (shows their email/phone)
+
+"✅ Completados este mes" section:
+- Collapsed by default
+- Show completed projects with 
+  completion date and final progress
+
+SUBSECTION F — Company performance:
+Title: "📊 Rendimiento por Empresa"
+
+Table:
+- Empresa
+- Proyectos completados
+- Proyectos activos
+- Promedio días de entrega vs estimado
+- % proyectos entregados a tiempo
+- Promedio avance general
+- Tiempo promedio aprobación de reportes
+
+GENERAL:
+- All data filtered to supervisor_id = 
+  logged-in supervisor
+- Date range filter affects historical 
+  data but not active project views
+- Refresh every 5 minutes automatically
+- "♻️ Actualizar" manual refresh button

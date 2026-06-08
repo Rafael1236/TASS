@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/"
+title = "TAS Bot Tecnico"
+version = "1.0.0"
+id = "artifacts/tas-bot"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+name = "expo"
+paths = [ "/" ]
+localPort = 19655
+
+[services.development]
+run = "pnpm --filter @workspace/tas-bot run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/tas-bot", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/tas-bot", "run", "serve" ]
+
+[services.env]
+PORT = "19655"
+BASE_PATH = "/"

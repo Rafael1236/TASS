@@ -1,0 +1,67 @@
+There are two bugs to fix in the boleta 
+review dashboard:
+
+BUG 1 — "Falta # llamada" button not showing:
+The "⚠️ Falta # llamada" button should appear 
+on every boleta card where numero_llamada is 
+empty, null, or an empty string.
+
+Please check:
+1. The condition to show this button — it may 
+   be checking the wrong field or the field 
+   has a default value that is not empty
+2. Make sure it checks:
+   !report.numero_llamada || 
+   report.numero_llamada.trim() === ''
+3. The button must be visible alongside the 
+   "✓ Boleta revisada" button when there 
+   is no call number
+4. Test by looking at reports that were 
+   created without a numero_llamada and 
+   confirm the button appears
+
+BUG 2 — "Boleta revisada" button does nothing:
+When clicking "✓ Boleta revisada" nothing 
+happens. Please debug and fix:
+
+1. Add console.log at the start of the 
+   click handler to confirm it fires
+2. Check the API call being made — it should 
+   call PATCH or PUT to update the report:
+   - estado_revision = 'revisada'
+   - revisado_por = supervisor name
+   - revisado_at = now()
+   - tiempo_revision_minutos = calculated
+   - es_reproceso = checkbox state
+
+3. Check if the endpoint exists on the server:
+   PATCH /api/reports/:id/review
+   If it does not exist, create it
+
+4. The endpoint should:
+   a. Receive: { 
+        revisado_por, 
+        es_reproceso,
+        estado_revision: 'revisada'
+      }
+   b. Update the reportes table in Supabase
+   c. Calculate tiempo_revision_minutos 
+      as difference between created_at 
+      and now() in minutes
+   d. Return the updated report
+   e. On success: remove the card from 
+      pending list and show success toast
+
+5. Check Supabase RLS policies — the anon 
+   user needs UPDATE permission on reportes.
+   Add if missing:
+   CREATE POLICY "anon can update reportes" 
+   ON reportes FOR UPDATE TO anon USING (true);
+
+6. Check browser console for any errors 
+   when the button is clicked and fix them.
+
+After fixing both bugs, test:
+- Create a report without numero_llamada 
+  → both buttons should appear
+- Cr

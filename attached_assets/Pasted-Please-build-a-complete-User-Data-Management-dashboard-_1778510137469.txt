@@ -1,0 +1,184 @@
+Please build a complete User & Data Management 
+dashboard at /dashboard/gestion with 4 modules.
+
+ACCESS CONTROL:
+- admin: access to ALL 4 modules
+- gerente_operaciones (mario.chicas, maribel.santos): 
+  access to modules 1 and 2 only
+- All other roles: no access, redirect to 
+  their respective dashboard
+
+ADD "Gestión" link to the top navbar of ALL 
+dashboards, visible only to admin and 
+gerente_operaciones roles.
+
+MODULE 1 — Gestión de Subcontratos:
+URL: /dashboard/gestion/subcontratos
+
+Layout: Left sidebar shows list of companies
+from subcontratos_empresas table.
+Clicking a company shows their detail on the right.
+
+COMPANY DETAIL:
+- Company name, contact, phone, email (editable)
+- "Líder de empresa" field (editable text)
+- Edit and Save buttons
+
+TECHNICIANS SECTION per company:
+Table showing all technicians from 
+subcontratos_tecnicos where empresa_id matches:
+Columns: Nombre, DUI, ISSS (✓/✗), 
+Exámenes médicos (fecha vencimiento + status),
+Estado (Activo/Inactivo)
+
+"➕ Agregar técnico" button opens a modal:
+Fields:
+- Nombre completo *
+- DUI (text input)
+- Teléfono
+- Fecha de ingreso (date picker)
+- ¿Tiene ISSS? (toggle Sí/No)
+- Foto del DUI (file upload → 
+  Supabase Storage bucket: documentos-personal
+  path: subcontratos/[empresa_id]/dui/[nombre])
+- Exámenes médicos (multiple file upload →
+  path: subcontratos/[empresa_id]/examenes/[nombre])
+- Fecha vencimiento exámenes (date picker)
+- Estado: Activo/Inactivo toggle
+
+ALERTS:
+- Red badge on technician row if 
+  examenes expire in less than 30 days
+- Amber badge if expire in 30-60 days
+- Show count of expiring exams in 
+  company card in left sidebar
+
+MODULE 2 — Gestión de Técnicos TAS:
+URL: /dashboard/gestion/tecnicos
+
+Table showing all users from usuarios table
+where rol IN ('tecnico','supervisor') AND activo = true
+Filters: by departamento, by rol, search by name
+
+Columns: Nombre, Usuario, Departamento, 
+Rol (colored badge), Correo, Estado
+
+"➕ Nuevo técnico" button opens modal:
+Fields:
+- Nombre completo *
+- Usuario * (auto-suggested: nombre.apellido)
+- Correo electrónico
+- Contraseña * (default: TAS2026!)
+- Departamento (dropdown: 
+  MANTO, SOPORTE, PROYECTOS, PARKING, 
+  SOPORTE EN SITIO, ADMON. PROYECTOS)
+- Rol (dropdown: tecnico, supervisor)
+- DUI (text input)
+- Foto del DUI (file upload →
+  path: tas/tecnicos/[usuario]/dui)
+- Teléfono
+- Fecha de ingreso (date picker)
+- Activo toggle (default: true)
+
+EDIT existing technician:
+Click row → opens same modal pre-filled
+Can edit all fields including:
+- Change password (show/hide toggle)
+- Change rol
+- Activate/deactivate
+
+MODULE 3 — Organizador de Clientes (CRM):
+URL: /dashboard/gestion/clientes
+ACCESS: admin only
+
+Search bar at top: search by name, 
+codigo_sn, NIT, correo
+
+Table with columns:
+Nombre comercial, Código SAP, Correo, 
+NIT, Contacto, Vendedor, Segmento, 
+Última visita (from reportes table)
+
+"➕ Nuevo cliente" button opens modal:
+Fields:
+- Nombre comercial *
+- Código SAP (codigo_sn)
+- NIT
+- Registro fiscal
+- Correo electrónico
+- Teléfono
+- Dirección
+- Persona de contacto *
+- Cargo del contacto
+- Facturar a nombre de
+- Vendedor asignado (dropdown from usuarios 
+  where rol = 'gerente_comercial')
+- Segmento (chips: Residencial, Comercial, 
+  Gobierno, Industrial, Educación, Salud)
+- Sitio web
+- Notas internas (text area)
+
+EDIT existing client:
+Click row → opens same modal pre-filled
+Show at bottom: "Historial de boletas" 
+with last 5 boletas for this client
+(numero_reporte, fecha, tecnico, estado)
+
+MODULE 4 — Gestión de Usuarios y Roles:
+URL: /dashboard/gestion/usuarios
+ACCESS: admin only
+
+Table showing ALL users from usuarios table
+Columns: Nombre, Usuario, Correo, Rol 
+(colored editable badge), Departamento, 
+Último acceso, Estado
+
+ROLE BADGES colors:
+admin: purple
+gerente_operaciones: blue
+gerente_comercial: green
+supervisor: amber
+tecnico: gray
+subcontratista: orange
+
+ACTIONS per row:
+- Edit rol: click badge → dropdown to change
+- Change password: key icon → modal with 
+  new password field
+- Toggle active/inactive: toggle switch
+- Delete: trash icon with confirmation
+
+"➕ Nuevo usuario" button:
+Fields: nombre, usuario, correo, 
+rol (dropdown), departamento, contraseña
+
+SPECIAL: Show Mario Chicas and Maribel Santos
+with a note: "Acceso a Módulos 1 y 2 de Gestión"
+
+ALSO ADD to all existing dashboards 
+(operaciones, supervisor, comercial, 
+subcontratos):
+A "👥 Gestión de Roles" section in the 
+top right of the navbar showing a small 
+user icon. Clicking it opens a mini modal:
+- Shows logged-in user info
+- If admin: shows "Gestionar usuarios →" 
+  link to /dashboard/gestion/usuarios
+- If gerente_operaciones: shows 
+  "Gestionar técnicos →" link to 
+  /dashboard/gestion/tecnicos
+
+FILE UPLOADS for all modules:
+- Use Supabase Storage bucket: 
+  "documentos-personal"
+- Show upload progress
+- After upload: show file thumbnail 
+  for images, file icon for PDFs
+- Allow multiple files for exámenes médicos
+- Max file size: 10MB per file
+- Accepted formats: PDF, JPG, PNG
+
+NAVIGATION:
+Add "Gestión" tab to top navbar in ALL 
+dashboards. Show only to admin and 
+gerente_operaciones roles.

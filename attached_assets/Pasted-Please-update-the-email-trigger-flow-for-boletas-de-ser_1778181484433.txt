@@ -1,0 +1,66 @@
+Please update the email trigger flow for 
+boletas de servicio:
+
+CURRENT FLOW (wrong):
+- Technician confirms → 3 emails sent:
+  1. Client email
+  2. Operations email  
+  3. Commercial email
+
+NEW FLOW:
+
+TRIGGER 1 — When technician confirms boleta:
+- Send ONLY the client email (no change)
+- Do NOT send operations or commercial emails
+- Remove those two email triggers from the 
+  report confirmation flow
+
+TRIGGER 2 — When supervisor clicks 
+"Boleta revisada" in the review dashboard:
+- Send commercial email automatically
+- If boleta has numero_llamada: send normal 
+  commercial email (existing template)
+- If boleta has NO numero_llamada: send 
+  commercial email WITH a prominent alert 
+  section at the top:
+
+  RED ALERT BOX at top of email:
+  "⚠️ BOLETA SIN NÚMERO DE LLAMADA SAP
+  Esta boleta no tiene número de llamada 
+  asignado. Por favor ingrese el número 
+  de llamada en el dashboard comercial 
+  para completar el registro."
+  Button: "Ingresar # llamada →"
+  
+  Then the rest of the commercial email 
+  content as normal (client, technician, 
+  work description, cotización if any)
+
+- Do NOT send operations email at any point
+  (supervisor already saw the boleta in 
+  the review dashboard)
+
+ALSO UPDATE:
+The "Falta # llamada" button in supervisor 
+dashboard should NOT send a separate email —
+the commercial email sent on "Boleta revisada" 
+already includes the alert when there is no 
+call number. Remove the duplicate email from 
+the "Falta # llamada" button flow.
+
+Keep the dashboard behavior exactly as is:
+- "Falta # llamada" still moves boleta to 
+  commercial dashboard pending section
+- Commercial team still sees and can enter 
+  the call number
+- Timers still work as before
+
+SUMMARY OF CHANGES:
+1. Remove operations email entirely
+2. Remove commercial email from confirmation
+3. Add commercial email to supervisor 
+   "Boleta revisada" action
+4. Commercial email includes SAP alert 
+   when numero_llamada is empty
+5. Remove duplicate email from 
+   "Falta # llamada" button

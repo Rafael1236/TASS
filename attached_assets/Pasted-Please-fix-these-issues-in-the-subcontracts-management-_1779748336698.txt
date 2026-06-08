@@ -1,0 +1,115 @@
+Please fix these issues in the subcontracts 
+management module at /dashboard/gestion/
+subcontratos:
+
+CHANGE 1 — Technicians in daily report 
+must come from gestion module only:
+In the subcontractor app, when filling 
+a new daily report, the technicians list 
+in step 2 must:
+
+1. Query ONLY subcontratos_tecnicos table
+   WHERE empresa_id = logged-in user's 
+   empresa_id AND activo = true
+
+2. Show as selectable chips/tags — 
+   tap to select, tap again to deselect
+
+3. REMOVE the ability to add technician 
+   names manually — no free text input
+   Users can only select from the 
+   registered list
+
+4. If no technicians exist for this company
+   show message: "No hay técnicos registrados.
+   Contactá al supervisor para agregar 
+   técnicos en el sistema."
+
+5. When new technicians are added in 
+   /dashboard/gestion/subcontratos they 
+   must appear immediately in the app 
+   without requiring logout/login
+
+CHANGE 2 — Fix password change for 
+subcontract users:
+In /dashboard/gestion/subcontratos, the 
+password change for subcontract access 
+users (subcontratos_usuarios) is returning 
+an error.
+
+Fix the endpoint:
+PUT /api/gestion/subcontratos/usuarios/:id/password
+
+Must execute:
+UPDATE subcontratos_usuarios 
+SET password_hash = new_password
+WHERE id = $1
+
+Steps to fix:
+1. Check the exact error being returned
+2. Verify the endpoint exists and is 
+   correctly mapped
+3. Verify Supabase RLS allows UPDATE 
+   on subcontratos_usuarios
+4. Add console.log to trace the error
+5. Return clear error message to frontend
+
+Also add RLS policy if missing:
+CREATE POLICY "anon can update 
+subcontratos_usuarios password" 
+ON subcontratos_usuarios 
+FOR UPDATE TO anon USING (true);
+
+CHANGE 3 — Fix technician registration form:
+In the "Agregar técnico subcontratista" modal
+in /dashboard/gestion/subcontratos:
+
+REMOVE this field:
+- Fecha de ingreso (remove completely)
+
+KEEP these fields only:
+- Nombre * (required)
+- Apellido * (required) 
+- Fecha de nacimiento (date picker)
+- DUI (text input, format: 00000000-0)
+- Teléfono (text input)
+- ISSS (toggle: Sí/No) 
+- Activo (toggle, default: true)
+
+Also update the technician card display 
+to show: nombre completo, DUI, ISSS status, 
+teléfono, activo badge.
+
+CHANGE 4 — Company leader must be selected 
+from access users:
+In the company detail view in 
+/dashboard/gestion/subcontratos, the 
+"Líder de empresa" field must be a 
+dropdown that shows the access users 
+(subcontratos_usuarios) registered for 
+that company.
+
+Current behavior: free text input
+New behavior: dropdown selector
+
+Implementation:
+1. Query subcontratos_usuarios WHERE 
+   empresa_id = current company id
+2. Show as dropdown with user names
+3. On select: save the selected user's 
+   nombre to subcontratos_empresas.lider
+   AND save the user's id to a new field
+   subcontratos_empresas.lider_usuario_id
+
+Add the new field:
+ALTER TABLE subcontratos_empresas 
+ADD COLUMN IF NOT EXISTS lider_usuario_id 
+uuid references subcontratos_usuarios(id);
+
+4. Display selected leader prominently 
+   in the company header:
+   "👤 Líder: [nombre]"
+
+5. In the project cards and assignment 
+   form, also show the company leader 
+   as reference

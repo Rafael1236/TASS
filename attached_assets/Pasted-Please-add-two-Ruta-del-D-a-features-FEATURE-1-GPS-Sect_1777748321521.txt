@@ -1,0 +1,65 @@
+Please add two "Ruta del Día" features:
+
+FEATURE 1 — GPS Section button in operations dashboard:
+Add a "🗺️ Ruta del Día" button in the GPS section header.
+
+When clicked, show a panel with:
+1. Vehicle dropdown with TAS plates:
+   P3897A, P389AA, P62FA0, P62FFA, 
+   P62FF2, P62FAF, P5176A, P963771
+   Plus "Seleccionar vehículo..." as default
+2. Date picker — single day only, no ranges
+3. "Ver Ruta" button
+
+When "Ver Ruta" is clicked:
+- Query Geotab API for all LogRecords (GPS track 
+  points) for that vehicle on that date
+- Open a modal with a full Google Maps embed 
+  showing:
+  a. A polyline connecting all GPS points 
+     in chronological order — the full route
+  b. Green marker at first point (inicio del día)
+  c. Red marker at last point (fin del día)
+  d. Blue markers at each stop over 5 minutes
+     with a popup showing address and time spent
+- Below the map show a timeline of stops:
+  Hora llegada | Hora salida | Tiempo | Dirección
+
+FEATURE 2 — Route button inside SAP call report:
+In the detailed report view accessed by searching 
+a SAP call number, add a "🗺️ Ver Ruta" button 
+inside each boleta card.
+
+Each boleta has a fecha and placa_vehiculo field.
+When "Ver Ruta" is clicked on a boleta:
+- Use that boleta's fecha and placa_vehiculo
+- Open the same map modal as Feature 1
+- Show the full route for that vehicle on that day
+- Highlight the approximate time window of the 
+  service (between hora_entrada and hora_salida) 
+  with a different color on the route line:
+  Gray = before service start
+  Green = during service (entrada to salida)
+  Gray = after service end
+
+GOOGLE MAPS EMBED:
+Use Google Maps JavaScript API or Static Maps.
+We need a Google Maps API key — please show me 
+where to add it as GOOGLE_MAPS_API_KEY in 
+Replit Secrets.
+
+NEW API ENDPOINT:
+POST /api/geotab/route
+Body: { 
+  "date": "2026-04-29", 
+  "plate": "P3897A",
+  "hora_entrada": "09:00",
+  "hora_salida": "11:30"
+}
+Returns: array of GPS coordinates with timestamps
+[{
+  "lat": 13.7034,
+  "lng": -89.2182,
+  "timestamp": "2026-04-29T09:15:00",
+  "speed": 0
+}]

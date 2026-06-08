@@ -1,0 +1,66 @@
+Please add a client signature step to the report 
+flow, just before the final "Confirmar" button.
+
+FLOW:
+1. Technician fills all fields
+2. Bot shows summary card (existing)
+3. NEW: "Firma del cliente" button appears 
+   below the summary
+4. Client signs on screen with finger
+5. Technician taps "Confirmar con firma"
+6. Report saves with signature image
+
+SIGNATURE SCREEN:
+When "Firma del cliente" is tapped, open a 
+full-screen signature modal:
+
+- Black or very dark background #111111
+- Top bar with title: "Firma del cliente"
+  and a "← Volver" button top left
+- Large white canvas in the center for drawing
+  - Canvas should be at least 300px tall
+  - White background with subtle border
+  - Smooth finger drawing with black ink
+  - Stroke width: 2-3px for clean signature
+- Below canvas: two buttons side by side:
+  - "Limpiar" (clear) — gray, resets the canvas
+  - "Confirmar firma" — green #1D9E75, 
+    saves and closes modal
+- Above canvas: instruction text in gray:
+  "Pida al cliente que firme aquí"
+- After signing, show a small preview of 
+  the signature in the summary card with 
+  a checkmark: "✓ Firma capturada"
+
+TECHNICAL IMPLEMENTATION:
+- Use React Native's PanResponder or 
+  react-native-signature-canvas library
+  to capture touch/finger drawing
+- Convert the signature canvas to a PNG image
+- Upload the PNG to Supabase Storage bucket 
+  "fotos-reportes" with filename:
+  "firma_[reporte_id]_[timestamp].png"
+- Save the public URL to 
+  reportes.firma_cliente_url field
+
+SIGNATURE VALIDATION:
+- If technician tries to tap "Confirmar" 
+  without capturing a signature, show a 
+  message: "Por favor capture la firma 
+  del cliente antes de confirmar"
+- Add a "Continuar sin firma" option as 
+  a small text link below for cases where 
+  client is not present
+
+SUMMARY CARD UPDATE:
+After signature is captured show in the 
+summary card:
+- Small thumbnail of the signature
+- Green checkmark badge: "Firma capturada ✓"
+- Gray text below: "Toca para ver o volver 
+  a capturar"
+
+Also save the signature in the PDF report 
+generated for SAP call number searches — 
+show it at the bottom of each boleta with 
+a "Firma del cliente:" label.

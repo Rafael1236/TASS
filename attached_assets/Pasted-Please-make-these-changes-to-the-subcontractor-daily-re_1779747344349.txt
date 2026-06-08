@@ -1,0 +1,76 @@
+Please make these changes to the subcontractor 
+daily report form:
+
+CHANGE 1 — Progress calculation must be GLOBAL:
+The progress percentage entered for each 
+activity must represent the TOTAL accumulated 
+progress of that activity, not the progress 
+for today only.
+
+CURRENT (wrong):
+- Shows "Avance de hoy: X%"
+- Adds today's % to previous accumulated %
+- Example: if activity was at 60% and user 
+  enters 20%, it becomes 80%
+
+NEW (correct):
+- Shows "Avance total de la actividad: X%"
+- The number entered IS the total progress
+- Example: if activity was at 60% and user 
+  enters 80%, it saves as 80% total
+- The slider/input goes from 0 to 100
+- Label: "¿En qué porcentaje está esta 
+  actividad actualmente?"
+- Show previous value as reference:
+  "Última actualización: 60%"
+- Validation: cannot enter less than the 
+  current saved value
+  Show warning: "El avance no puede ser 
+  menor al registrado anteriormente (60%)"
+
+Update the backend to SET the percentage 
+directly instead of adding to it:
+UPDATE subcontratos_actividades_proyecto
+SET porcentaje_avance = new_value
+WHERE id = actividad_id
+(not += but = )
+
+CHANGE 2 — Remove check-in photo:
+- Remove the "Foto de check-in" field 
+  entirely from the form
+- Remove foto_checkin_url from the 
+  report submission
+- This field is no longer required
+
+CHANGE 3 — Make evidence photos REQUIRED:
+- The "Fotos de evidencia" section must 
+  be required — at least 1 photo mandatory
+- Add red asterisk * to the label:
+  "Fotos de evidencia *"
+- Cannot submit report without at least 
+  1 photo attached
+- Show validation message if missing:
+  "Debes adjuntar al menos una foto 
+  de evidencia"
+- Add this to the submit button validation
+
+CHANGE 4 — Remove check-out photo:
+- Remove the "Foto de check-out" field 
+  entirely from the form
+- Remove foto_checkout_url from the 
+  report submission
+- This field is no longer required
+
+FINAL FORM STRUCTURE after changes:
+1. Actividades trabajadas hoy * 
+   (with global % input per activity)
+2. Técnicos presentes *
+3. Descripción del trabajo * 
+   (with mic button - keep existing)
+4. Fotos de evidencia * 
+   (required, min 1 photo)
+5. Submit button: "Enviar reporte"
+
+Remove from form:
+- Foto de check-in (step 3 previously)
+- Foto de check-out (step 6 previously)

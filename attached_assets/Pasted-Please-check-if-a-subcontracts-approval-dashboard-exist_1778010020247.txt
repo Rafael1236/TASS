@@ -1,0 +1,71 @@
+Please check if a subcontracts approval dashboard 
+exists in the web dashboard. If it does not exist, 
+please build it.
+
+The subcontracts approval dashboard should be 
+accessible from the operations dashboard as a 
+new tab or link: "Subcontratos"
+
+URL: /dashboard/subcontratos
+
+DESIGN:
+- Same TAS dark theme: #1A1A1A background, 
+  #CC0000 accent, white text
+- Add navigation link in both dashboards:
+  Operations: "Subcontratos" tab
+  Commercial: "Subcontratos" tab
+
+SECTION 1 — KPI Cards:
+- Total proyectos activos
+- Reportes pendientes de aprobación (highlighted red)
+- Reportes aprobados este mes
+- Proyectos con días al límite (>90%)
+
+SECTION 2 — Pending Approvals (priority section):
+Title: "⏳ Pendientes de aprobación"
+For each pending report show a card with:
+- Project name and client
+- Subcontractor company name
+- Date of report
+- Technicians present (count + names)
+- Activity worked
+- Progress percentage
+- Work description
+- Photo thumbnails (clickable to full size)
+- Check-in photo
+- Days counter for the project
+TWO ACTION BUTTONS per card:
+- "✓ Aprobar" green button
+- "✗ Rechazar" red button
+When "Rechazar" is clicked:
+- Show inline text field: "Motivo del rechazo"
+- Required before submitting
+- "Confirmar rechazo" button
+
+AFTER APPROVE:
+- Update subcontratos_reportes.estado = 'aprobado'
+- Record aprobado_por = supervisor name
+- Record aprobado_at = now()
+- Update dias_utilizados in project
+- Send email to subcontractor notifying approval
+
+AFTER REJECT:
+- Update estado = 'rechazado'
+- Save comentario_rechazo
+- Send email to subcontractor with rejection 
+  reason so they can correct and resubmit
+
+SECTION 3 — Active Projects table:
+Columns: Proyecto, Cliente, Empresa, 
+Días utilizados/máximos (progress bar), 
+% avance general, Estado
+Click row to see full project timeline
+
+SECTION 4 — Project Timeline view:
+When a project row is clicked, show full 
+timeline with all daily reports chronologically.
+Each node: date, technicians, activity, 
+% advance, status badge, expandable photos.
+
+Add navigation link "← Dashboard Operaciones" 
+to return to main dashboard.

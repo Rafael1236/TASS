@@ -1,0 +1,72 @@
+Please add a project assignment screen to the 
+subcontracts dashboard at /dashboard/subcontratos.
+
+Add a new button "➕ Nuevo Proyecto" in the 
+subcontracts dashboard header that opens a 
+modal or new page to create and assign a 
+project to a subcontractor.
+
+PROJECT CREATION FORM:
+
+STEP 1 — Project Info:
+- Nombre del proyecto (text, required)
+- Cliente (dropdown from clientes table, required)
+- Número de proyecto SAP (text, optional)
+- Fecha de inicio (date picker, default today)
+- Fecha fin estimada (date picker, required)
+- Días máximos permitidos (number, required)
+  Auto-calculated from dates but editable
+
+STEP 2 — Assign Subcontractor:
+- Empresa subcontratista (dropdown from 
+  subcontratos_empresas table, required)
+- Usuario subcontratista (dropdown filtered 
+  by selected company from 
+  subcontratos_usuarios table, required)
+- Supervisor a cargo (text, required)
+- Correo del supervisor (text, required)
+  Pre-fill from logged-in supervisor if available
+
+STEP 3 — Assign Activities:
+- Show full catalog from 
+  subcontratos_actividades_catalogo table
+- Checkboxes to select which activities 
+  apply to this project
+- At least 1 activity required
+- Selected activities will be tracked 
+  with progress % during the project
+
+STEP 4 — Review and Confirm:
+- Summary of all entered data
+- "Crear proyecto" button
+- On confirm:
+  a. Insert into subcontratos_proyectos table
+  b. Insert selected activities into 
+     subcontratos_actividades_proyecto table
+  c. Send email via Resend to subcontractor:
+     Subject: "Nuevo proyecto asignado — 
+     [nombre proyecto]"
+     Content: project details, activities list,
+     start date, deadline, max days,
+     supervisor contact
+     "Acceder al sistema" button link
+
+ADDITIONAL FEATURES:
+- Edit existing project button in project 
+  table rows — allows updating dates, 
+  days and supervisor
+- Deactivate project button with confirmation
+- Filter projects by empresa, estado, 
+  date range
+
+Also add a "Empresas y usuarios" section 
+in the subcontracts dashboard to manage:
+- List of subcontractor companies
+- List of users per company
+- Add new company button
+- Add new user to company button
+  (creates entry in subcontratos_usuarios 
+  with default password TAS2026!)
+
+Add navigation: "← Dashboard Operaciones" 
+at top to return to main dashboard.

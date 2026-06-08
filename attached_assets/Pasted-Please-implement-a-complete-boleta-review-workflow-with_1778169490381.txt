@@ -1,0 +1,148 @@
+Please implement a complete boleta review 
+workflow with timers. Here are all the changes:
+
+IMPORTANT: The client email always goes out 
+immediately when the technician confirms — 
+this does not change. Everything below is 
+INTERNAL only.
+
+PART 1 — DATABASE FIELDS (already added 
+to Supabase, just use them):
+- estado_revision: 'pendiente_revision' | 
+  'revisada' | 'pendiente_llamada'
+- revisado_por: text
+- revisado_at: timestamp
+- tiempo_revision_minutos: integer
+- es_reproceso: boolean default false
+- falta_numero_llamada: boolean default false
+- numero_llamada_solicitado_at: timestamp
+- numero_llamada_ingresado_at: timestamp
+- numero_llamada_ingresado_por: text
+
+PART 2 — FLOW CHANGE:
+When technician confirms a report:
+1. Send client email immediately (no change)
+2. Send existing internal emails (no change)
+3. Set estado_revision = 'pendiente_revision'
+4. Record created_at timestamp (already exists)
+
+PART 3 — NEW SUPERVISOR REVIEW DASHBOARD:
+Add a new section "📋 Revisión de Boletas" 
+in the operations dashboard, above the 
+existing reports table.
+
+This section shows all reports where 
+estado_revision = 'pendiente_revision'
+
+For each pending boleta card show:
+- Report number and date
+- Technician name
+- Client name
+- SAP call number (or "Sin # llamada" in red 
+  if numero_llamada is empty)
+- Service type
+- Work description (truncated)
+- Live timer showing time since report was 
+  created — counting up in real time:
+  Format: "Esperando revisión: 2h 15m"
+  Color: green < 1h, amber 1-4h, red > 4h
+- Reproceso checkbox: 
+  "☐ Marcar como reproceso"
+  When checked: turns red, label changes to
+  "☑ Reproceso"
+
+TWO ACTION BUTTONS per card:
+A) "✓ Boleta revisada" (green button)
+   - Available always
+   - On click:
+     * Set estado_revision = 'revisada'
+     * Set revisado_por = supervisor name
+     * Set revisado_at = now()
+     * Calculate tiempo_revision_minutos = 
+       difference between created_at and now()
+     * Save es_reproceso from checkbox state
+     * Report now appears as complete in 
+       operations dashboard
+
+B) "⚠️ Falta # llamada" (amber button)
+   - Only show if numero_llamada is empty
+   - On click:
+     * Set estado_revision = 'pendiente_llamada'
+     * Set falta_numero_llamada = true
+     * Set numero_llamada_solicitado_at = now()
+     * Send email via Resend to sales manager:
+       To: hpinaud@tas-seguridad.com 
+       (placeholder, configure later)
+       Subject: "⚠️ Boleta sin # llamada — 
+       [cliente] — Reporte #[numero]"
+       Content: technician, client, date, 
+       work description, 
+       "Por favor ingrese el número de llamada 
+       SAP para este trabajo."
+       Button: "Ingresar # llamada"
+
+PART 4 — COMMERCIAL DASHBOARD ADDITION:
+Add a new section "📞 Boletas pendientes 
+de llamada" at the top of the commercial 
+dashboard.
+
+Shows all reports where 
+estado_revision = 'pendiente_llamada'
+
+For each card show:
+- Report number, date, technician, client
+- Work description
+- Live timer counting from 
+  numero_llamada_solicitado_at:
+  Format: "Sin # llamada: 1h 30m"
+  Color: green < 2h, amber 2-8h, red > 8h
+- Input field: "Número de llamada SAP"
+  Text input + "Guardar" button
+  On save:
+  * Update reportes.numero_llamada
+  * Set numero_llamada_ingresado_at = now()
+  * Set numero_llamada_ingresado_por = 
+    user name
+  * Set estado_revision = 'revisada'
+  * Calculate and store response time
+  * Report automatically becomes complete
+  * No need to go back to supervisor
+
+PART 5 — KPI UPDATES:
+
+Operations dashboard KPIs — add:
+- "Pendientes de revisión" count (red if > 0)
+- "Reprocesos hoy" count
+- "Tiempo promedio de revisión" in minutes
+
+Supervisor review section KPIs:
+- Average review time this week
+- Total reviewed today
+- Total pending right now
+
+Commercial dashboard KPIs — add:
+- "Boletas sin # llamada" count
+- "Tiempo promedio para ingresar # llamada"
+
+PART 6 — TIMERS IMPLEMENTATION:
+All timers must be LIVE — counting up in 
+real time without page refresh.
+Use setInterval every 60 seconds to 
+update displayed times.
+Store start timestamps in DB, calculate 
+display time on frontend.
+
+Timer format:
+- Under 1 hour: "Xm"
+- 1-24 hours: "Xh Ym"
+- Over 24 hours: "Xd Yh" in red bold
+
+PART 7 — REPROCESO KPI:
+In operations dashboard main KPI cards, 
+add a new card:
+- "♻️ Reprocesos" 
+- Count of es_reproceso = true for 
+  current date range filter
+- Click to filter table showing only 
+  reproceso reports
+- Track trend: "↑ 2 vs ayer"

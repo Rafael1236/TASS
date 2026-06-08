@@ -1,0 +1,79 @@
+Please make these two changes to the TAS 
+technician mobile app:
+
+CHANGE 1 — Dark/Light mode toggle in app:
+Add a theme toggle button on the TAS home 
+screen (the screen showing Nueva Boleta and 
+Consultar Cliente).
+
+- Position: top right of the home screen, 
+  next to the logout button
+- Icon: 🌙 when in dark mode, ☀️ when in 
+  light mode
+- Tapping it switches between dark and 
+  light theme instantly
+- Save the preference in AsyncStorage so 
+  it persists when the app is closed and 
+  reopened
+- The toggle must apply to ALL screens in 
+  the app — not just the home screen
+
+DARK MODE colors (current default):
+- Background: #111111
+- Cards: #1C1C1C
+- Text: #FFFFFF
+- Secondary text: #9A9A9A
+- Accent: #CC0000
+- Input fields: #2A2A2A
+- Borders: #333333
+
+LIGHT MODE colors:
+- Background: #F5F5F5
+- Cards: #FFFFFF
+- Text: #111111
+- Secondary text: #555555
+- Accent: #CC0000 (stays the same)
+- Input fields: #FFFFFF
+- Borders: #E0E0E0
+- Shadow: subtle drop shadow on cards
+
+IMPORTANT:
+- TAS red #CC0000 stays the same in both modes
+- All layouts, spacing and functionality 
+  stay exactly the same
+- Only colors change
+- Apply to all screens including:
+  Hub, Login, Home, Nueva Boleta form,
+  Consultar Cliente, Subcontratos
+
+CHANGE 2 — Remove Whisper integration:
+Remove all Whisper/OpenAI audio transcription 
+from the app completely.
+
+- Remove the 🎤 microphone buttons from 
+  all text fields in the boleta form:
+  * Descripción del trabajo realizado
+  * Equipos instalados
+  * Materiales y repuestos
+  * Observaciones
+  * Descripción de cotización
+  * Descripción en reporte de subcontrato
+
+- Remove all Whisper API calls from the 
+  backend (any endpoint that calls OpenAI 
+  Whisper for transcription)
+
+- Remove the OPENAI_API_KEY dependency 
+  if it was only used for Whisper
+
+- The text fields remain exactly as they 
+  are — users will use their phone's native 
+  keyboard which already includes built-in 
+  voice dictation on both iOS and Android
+
+- Do NOT remove any text fields — only 
+  remove the custom microphone button UI 
+  and the Whisper backend calls
+
+After these changes the text fields should 
+be clean inputs without any custom mic button.

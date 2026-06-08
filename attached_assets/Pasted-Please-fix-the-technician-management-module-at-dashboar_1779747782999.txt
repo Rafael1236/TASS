@@ -1,0 +1,94 @@
+Please fix the technician management module 
+at /dashboard/gestion/tecnicos for users 
+with rol = 'gerente_operaciones' (maribel.santos, 
+mario.chicas).
+
+ISSUE 1 — Password change must work immediately:
+When editing a technician and changing their 
+password:
+
+1. The password field in the edit modal must:
+   - Show a text input for new password
+   - Have a show/hide toggle (eye icon)
+   - Placeholder: "Nueva contraseña"
+   - If left empty: keep existing password 
+     unchanged
+   - If filled: update immediately on save
+
+2. When saving with a new password:
+   - Update usuarios table:
+     SET password_hash = new_password
+     WHERE usuario = technician.usuario
+   - Use the same password storage method 
+     as the login system uses
+     (if login compares plain text, store 
+     plain text; if bcrypt, hash it)
+   - Return success confirmation
+
+3. The new password must work IMMEDIATELY 
+   for login — no restart required
+
+ISSUE 2 — All field changes must save to DB:
+When editing a technician and clicking Save,
+ALL fields must update in Supabase usuarios table:
+
+Fields that must save correctly:
+- nombre
+- usuario (login username)
+- correo
+- departamento
+- rol
+- activo (active/inactive toggle)
+- dui
+- telefono
+- fecha_ingreso
+
+Verify the PUT/PATCH endpoint:
+PUT /api/gestion/tecnicos/:id
+or
+PATCH /api/gestion/tecnicos/:id
+
+Must execute:
+UPDATE usuarios SET
+  nombre = $1,
+  correo = $2,
+  departamento = $3,
+  rol = $4,
+  activo = $5,
+  dui = $6,
+  telefono = $7,
+  fecha_ingreso = $8,
+  password_hash = CASE 
+    WHEN $9 IS NOT NULL AND $9 != '' 
+    THEN $9 
+    ELSE password_hash 
+  END
+WHERE id = $10
+
+Add console.log to confirm:
+- The data received by the endpoint
+- The Supabase update result
+- Any errors
+
+ISSUE 3 — Verify changes reflect immediately:
+After saving:
+- The technician list must refresh 
+  automatically showing updated data
+- Show a success toast: 
+  "✅ Técnico actualizado correctamente"
+- If there's an error show:
+  "❌ Error al guardar: [error message]"
+- Do not close the modal on error
+
+ISSUE 4 — Test these specific scenarios:
+1. Change nombre → verify it updates in DB
+2. Change rol from 'tecnico' to 'supervisor' 
+   → verify login routing changes immediately
+3. Change activo to false → verify user 
+   cannot login anymore
+4. Set new password → verify login works 
+   with new password immediately
+5. Change correo → verify email field updates
+
+Please add proper error handling throughout 
+so any DB errors are visible to the user.

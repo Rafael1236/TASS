@@ -1,0 +1,78 @@
+Please update the search bars in ALL dashboards 
+to support three search types:
+
+SEARCH BAR UPDATE (operations, supervisor, 
+commercial dashboards):
+
+Replace the current separate search inputs 
+with ONE unified smart search bar:
+
+DESIGN:
+- Single wide search input at the top
+- Placeholder: "Buscar por cliente, 
+  # llamada o # boleta..."
+- Search icon on the left
+- Clear button (×) on the right when 
+  text is entered
+- Below input: three quick filter pills:
+  [👤 Cliente] [📞 # Llamada] [📋 # Boleta]
+  Tapping a pill sets the search mode
+  Default: auto-detect
+
+AUTO-DETECT LOGIC:
+The search should automatically detect 
+what the user is typing:
+
+1. If input is a NUMBER only (digits):
+   - Search BOTH numero_llamada AND 
+     numero_reporte simultaneously
+   - Show results grouped:
+     "# Llamada: X resultados"
+     "# Boleta: X resultados"
+
+2. If input contains LETTERS:
+   - Search cliente_nombre 
+     using ILIKE '%term%'
+   - Show matching clients in dropdown
+   - When client selected: show their 
+     call numbers as a second step
+   - User selects call number → 
+     shows full consolidated report
+
+3. If user selects [# Llamada] pill first:
+   - Only search numero_llamada
+   - Show full consolidated report directly
+
+4. If user selects [# Boleta] pill first:
+   - Only search numero_reporte
+   - Show that specific boleta detail
+
+5. If user selects [👤 Cliente] pill first:
+   - Only search cliente_nombre
+   - Show client dropdown → 
+     call numbers → full report
+
+RESULTS DISPLAY:
+- Show results as dropdown while typing
+- Minimum 2 characters to trigger search
+- Debounce 300ms
+- Loading spinner while searching
+- "Sin resultados" message if nothing found
+- Recent searches saved locally 
+  (last 5 searches)
+
+For numero_reporte search:
+- Show the boleta detail directly in 
+  a modal or expanded view
+- All fields visible
+- Same format as supervisor review card
+
+Update these API endpoints to support 
+all three search types:
+GET /api/search?q=term&tipo=auto|llamada|boleta|cliente
+
+Apply to:
+- Operations dashboard
+- Supervisor dashboard  
+- Commercial dashboard
+Each respects their role-based data filters.

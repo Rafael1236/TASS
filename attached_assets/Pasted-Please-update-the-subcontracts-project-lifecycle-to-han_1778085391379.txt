@@ -1,0 +1,101 @@
+Please update the subcontracts project lifecycle 
+to handle all states based on dates correctly.
+
+PROJECT LIFECYCLE STATES:
+Calculate state dynamically based on dates:
+
+1. "por_iniciar" — fecha_inicio is in the future
+   TODAY < fecha_inicio
+
+2. "en_progreso" — project is active
+   fecha_inicio <= TODAY <= fecha_fin_estimada
+
+3. "en_riesgo" — over 80% of days consumed
+   dias_transcurridos >= (dias_maximos * 0.8)
+   AND TODAY <= fecha_fin_estimada
+
+4. "vencido" — past end date, not completed
+   TODAY > fecha_fin_estimada AND 
+   estado != 'completado'
+
+5. "completado" — manually marked as done
+
+DAYS CALCULATION:
+Always calculate dynamically, never store:
+
+IF state is "por_iniciar":
+  dias_para_iniciar = fecha_inicio - TODAY
+  
+IF state is "en_progreso" or "en_riesgo":
+  dias_transcurridos = TODAY - fecha_inicio
+  dias_restantes = fecha_fin_estimada - TODAY
+  porcentaje_dias = (dias_transcurridos / 
+    dias_maximos) * 100
+
+IF state is "vencido":
+  dias_vencido = TODAY - fecha_fin_estimada
+
+DISPLAY IN APP (subcontractor view):
+For "por_iniciar" projects:
+- Blue countdown badge: 
+  "🗓️ Inicia en X días"
+- Date: "Inicio: Viernes 9 de mayo"
+- Subtle message: "Prepara tu equipo, 
+  el proyecto comienza pronto."
+- Project card slightly dimmed/inactive
+
+For "en_progreso" projects:
+- Green/amber/red progress bar
+- "X de Y días — Z días restantes"
+- Active, full opacity card
+
+For "vencido" projects:
+- Red pulsing badge: "⚠️ Vencido — X días"
+- Dark red progress bar overflowing
+- Urgent visual treatment
+
+NOTIFICATIONS:
+Send email to subcontractor when:
+- Project assigned: 
+  "Tienes un nuevo proyecto. 
+  Inicia el [fecha]. Tienes [X] días para completarlo."
+- 3 days before start:
+  "Tu proyecto [nombre] inicia en 3 días."
+- 1 day before start:
+  "Tu proyecto [nombre] inicia mañana."
+- Day of start:
+  "Tu proyecto [nombre] comienza hoy."
+- 80% days consumed:
+  "Alerta: has usado el 80% del tiempo 
+  asignado para [proyecto]."
+- Project overdue:
+  "Tu proyecto [proyecto] ha vencido."
+
+Send email to supervisor when:
+- 80% days consumed alert
+- Project overdue alert
+- 3 days before deadline:
+  "El proyecto [nombre] vence en 3 días."
+
+DISPLAY IN DASHBOARD (supervisor view):
+Add a "Por iniciar" section above active 
+projects showing upcoming projects with 
+their start countdown.
+
+Color-coded badges in project table:
+- Blue pill: "Inicia en X días"
+- Green pill: "En progreso"  
+- Amber pill: "En riesgo"
+- Red pulsing pill: "Vencido"
+- Gray pill: "Completado"
+
+UPDATE PROJECT FORM:
+In the project creation form:
+- fecha_inicio: date picker (required)
+- fecha_fin_estimada: date picker (required)
+- dias_maximos: auto-calculated from dates
+  but supervisor can manually override
+  Show: "X días hábiles entre las fechas 
+  seleccionadas"
+- Add validation: fecha_fin must be after 
+  fecha_inicio

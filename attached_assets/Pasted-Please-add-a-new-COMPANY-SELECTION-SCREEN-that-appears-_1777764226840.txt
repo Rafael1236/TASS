@@ -1,0 +1,91 @@
+Please add a new COMPANY SELECTION SCREEN that 
+appears before everything else when the app loads.
+This is the "Hub de IA — Grupo López Pinaud".
+
+NAVIGATION FLOW:
+Company Selection Screen → (tap company) → 
+  TAS: existing home screen (already built)
+  Others: "IA en Construcción" screen
+
+DESIGN PHILOSOPHY:
+- Ultra modern, premium feel like Notion, Linear, 
+  Vercel or Arc browser — NOT WhatsApp style
+- Clean white or very light background
+- Subtle shadows, elegant typography
+- App icon grid layout like iOS home screen 
+  or a modern SaaS dashboard
+- No footer/cintillo on this screen
+
+COLORS (placeholder until logo is provided):
+- Background: #F8F8F8 (near white)
+- Cards: #FFFFFF with subtle shadow
+- Text primary: #111111
+- Text secondary: #666666
+- Accent: #1A1A1A
+- We will update colors once López Pinaud 
+  logo is shared
+
+LAYOUT:
+- Top: "Grupo López Pinaud" as subtle header
+- Below: "Selecciona tu empresa" in gray, small
+- Center: Grid of company app icons 2x3 or 
+  scrollable — each company is a card with:
+  - Company logo (placeholder circle with 
+    initials for now, will be replaced with 
+    real logos uploaded by user)
+  - Company name below the logo
+  - Subtle tap animation (scale down on press)
+- Cards should feel like app icons on iOS — 
+  rounded square, clean, premium
+
+COMPANIES (in this order):
+1. TAS — "Tecnología, Acceso & Seguridad"
+   → navigates to existing TAS home screen
+   Placeholder color: #CC0000
+
+2. ALTESA — "Alta Tecnología Salvadoreña"
+   → navigates to "IA en Construcción" screen
+   Placeholder color: #1A1A1A
+
+3. MOVUX — ""
+   → navigates to "IA en Construcción" screen
+   Placeholder color: #333333
+
+4. eTicket — ""
+   → navigates to "IA en Construcción" screen
+   Placeholder color: #222222
+
+5. ITT — ""
+   → navigates to "IA en Construcción" screen
+   Placeholder color: #111111
+
+LOGO PLACEHOLDERS:
+For now show a rounded square with the company 
+initials in white on the placeholder color.
+User will upload real logos to assets/ folder 
+and we will replace them later.
+File names to expect:
+- assets/logo-tas.png
+- assets/logo-altesa.png
+- assets/logo-movux.png
+- assets/logo-eticket.png
+- assets/logo-itt.png
+
+"IA EN CONSTRUCCIÓN" SCREEN:
+When any company except TAS is tapped:
+- Full screen dark background #111111
+- Large construction/coming soon illustration 
+  (use a clean SVG or emoji-based illustration)
+- Bold text: "IA en Construcción"
+- Subtitle: "[Company Name] — Próximamente"
+- Small text: "Estamos construyendo algo increíble."
+- A subtle animated element (pulsing dot or 
+  progress bar) to feel alive and modern
+- "← Volver" button at top left to go back 
+  to company selection
+- Style: feels like Vercel's deployment screen 
+  or Linear's empty state — minimal, confident
+
+Make the company selection screen feel like 
+opening a premium super-app. No TAS branding 
+here — this is the Grupo López Pinaud hub.

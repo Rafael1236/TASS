@@ -1,0 +1,188 @@
+Please reorganize all dashboards with the 
+following structure:
+
+OPERATIONS DASHBOARD (/dashboard/operaciones):
+
+SECTION 1 — Search bar (top, always visible):
+Two search inputs side by side:
+- "Buscar por # llamada SAP..." 
+- "Buscar por nombre de cliente..."
+Both trigger the existing consolidated 
+report view when used.
+
+SECTION 2 — KPI Cards:
+- Boletas hoy (not "reportes")
+- Boletas esta semana
+- Horas trabajadas esta semana
+- NPS promedio (show even if empty: "—")
+REMOVE: cotizaciones pendientes KPI
+
+SECTION 3 — Revisión de boletas:
+Title: "📋 Revisión de Boletas"
+
+Date range filter:
+- Calendar picker for date range
+- Default: today only (no range selected)
+- Quick buttons: Hoy | Esta semana | 
+  Este mes
+
+Average review time display:
+- Show ONE combined average: 
+  "Tiempo promedio de revisión: X min"
+- On hover OR click: expand tooltip/popover 
+  showing individual supervisor averages:
+  ┌─────────────────────────────┐
+  │ Alexander Menjivar  12 min  │
+  │ Sixto Pacas         8 min   │
+  │ Edgardo Mena        25 min  │
+  └─────────────────────────────┘
+
+Boletas table:
+- Show ALL pending boletas regardless 
+  of supervisor (estado_revision = 
+  'pendiente_revision' OR 'pendiente_llamada')
+- Add "Supervisor" column showing 
+  supervisor_nombre
+- Live timer per boleta
+- All existing action columns
+
+SECTION 4 — Reprocesos:
+Title: "♻️ Técnicos con Reprocesos"
+
+Chart: horizontal bar chart showing 
+technicians with most reprocesos
+(filter by selected date range)
+
+Table below chart:
+Columns: 
+- Técnico
+- # Boletas con reproceso
+- Última fecha
+- Llamadas (clickable links that open 
+  the full consolidated report for 
+  that call number — same view as 
+  the search at the top)
+
+SECTION 5 — Horas trabajadas:
+Title: "⏱️ Horas Trabajadas"
+
+Filters:
+- Date range (linked to main filter)
+- By technician (dropdown from usuarios)
+- By department/area
+
+Table:
+- Técnico
+- Departamento  
+- Total horas período
+- # Boletas
+- Promedio horas por boleta
+
+Bar chart: hours per technician
+
+SECTION 6 — GPS (unchanged, keep as is)
+
+---
+
+SUBCONTRATOS TAB 
+(inside operations dashboard):
+
+SECTION 1 — Supervisor KPIs:
+4 cards in a row:
+- Supervisor con mejor rendimiento
+  (lowest avg approval time)
+- Supervisor con más boletas asignadas
+- Supervisor con más subcontratos
+- Tiempo promedio aprobación (all supervisors)
+
+Supervisor comparison table:
+Columns: Supervisor, Boletas asignadas, 
+Boletas pendientes, Tiempo prom. revisión,
+Subcontratos activos, Reportes pendientes aprobación
+Each row clickable to filter all sections 
+below by that supervisor.
+
+SECTION 2 — Trabajos pendientes de aprobación:
+Title: "⏳ Aprobaciones Pendientes"
+Show ALL subcontract reports pending approval
+regardless of supervisor
+(estado = 'pendiente')
+Show supervisor name on each card
+Same approval cards as existing with 
+all report details and action buttons
+
+SECTION 3 — Subcontratos activos:
+All active projects regardless of supervisor
+Show supervisor column
+Days counter, progress bars, status badges
+
+SECTION 4 — Proyectos por iniciar:
+Upcoming projects with countdown
+Keep existing design
+
+SECTION 5 — Resumen de proyectos:
+Overall progress summary
+Keep existing design
+
+Always visible: "➕ Nuevo Proyecto" button
+in section header
+
+Keep existing: Empresas y usuarios section
+
+---
+
+SUPERVISOR DASHBOARD (/dashboard/supervisor):
+
+Same structure as operations but filtered 
+to logged-in supervisor only:
+
+SECTION 1 — Search:
+Same search bar but only searches within 
+their assigned boletas and clients
+
+SECTION 2 — KPIs (their data only):
+- Mis boletas hoy
+- Mis boletas esta semana  
+- Boletas pendientes de revisión
+- Tiempo promedio de revisión (mine)
+
+SECTION 3 — Mis boletas pendientes:
+Same review cards but only their boletas
+Same date filter
+NO supervisor average comparison 
+(they only see their own time)
+
+SECTION 4 — Rendimiento de mis técnicos:
+Table showing technicians who have submitted 
+boletas assigned to this supervisor:
+- Técnico
+- # Boletas período
+- Horas trabajadas
+- # Reprocesos
+- Último trabajo
+
+Reprocesos table:
+Same as operations but filtered to 
+their technicians only
+Clickable call numbers
+
+SECTION 5 — Mis subcontratos:
+Only projects where supervisor_id = 
+logged-in user
+Pending approvals for their projects only
+Project progress for their projects
+
+SECTION 6 — Horas trabajadas:
+Filtered to their team only
+
+GENERAL CHANGES FOR ALL DASHBOARDS:
+1. Replace ALL instances of "reporte/reportes" 
+   with "boleta/boletas" throughout all 
+   dashboard text, labels, titles, buttons
+   EXCEPT in "Reporte de llamada SAP" which 
+   keeps "reporte" as it refers to a document
+2. All date filters should be linked — 
+   changing the main date range updates 
+   all sections simultaneously
+3. Add a "Restablecer filtros" button 
+   that clears all filters back to default

@@ -1,0 +1,11 @@
+-- carlos.campos was accidentally added to the "usuarios" (TAS staff) table
+-- while his real account is in "subcontratos_usuarios".
+-- The login endpoint checks "usuarios" first, so he was being returned as
+-- tipo="tecnico" instead of tipo="subcontratista", blocking access to the
+-- subcontract module.
+--
+-- Verify before deleting:
+-- SELECT id, nombre, usuario, rol, activo FROM usuarios WHERE usuario = 'carlos.campos';
+--
+-- Run this to fix:
+DELETE FROM usuarios WHERE usuario = 'carlos.campos';

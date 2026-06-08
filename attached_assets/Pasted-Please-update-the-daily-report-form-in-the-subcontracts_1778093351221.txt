@@ -1,0 +1,95 @@
+Please update the daily report form in the 
+subcontracts module to allow selecting 
+MULTIPLE activities and setting individual 
+progress for each one in the same report.
+
+CURRENT BEHAVIOR (wrong):
+- Only one activity can be selected per report
+- One progress percentage for the whole report
+
+NEW BEHAVIOR:
+- Technician can select multiple activities 
+  in a single daily report
+- Each selected activity has its own 
+  individual progress slider/input
+
+UPDATED STEP 2 — Activities (replaces current):
+
+TITLE: "Actividades trabajadas hoy"
+
+Show all activities assigned to this project 
+as selectable cards:
+
+Each activity card shows:
+- Checkbox to select/deselect
+- Activity name
+- Current accumulated progress % 
+  (from previous reports)
+- When selected: show a progress input 
+  for TODAY's advance on that activity:
+  - Slider 0-100% OR number input
+  - Label: "Avance de hoy: X%"
+  - Show resulting total: 
+    "Total acumulado: Y%" 
+    (previous + today's advance)
+  - Validation: total cannot exceed 100%
+    Show warning: "Esta actividad ya está 
+    al 100%. ¿Deseas marcarla como completada?"
+
+Example UI flow:
+[ ] Canalizado ........... 100% completado
+[✓] Cableado ............. 60% acumulado
+    Avance de hoy: [--●--------] 20%
+    Total acumulado: 80%
+[✓] Montaje de equipos ... 0% acumulado  
+    Avance de hoy: [●-----------] 10%
+    Total acumulado: 10%
+[ ] Configuraciones ...... 0% acumulado
+
+Must select at least 1 activity to submit.
+
+BACKEND CHANGES:
+
+1. Update POST /api/subcontratos/reporte to 
+   accept an array of activities:
+   {
+     proyecto_id: uuid,
+     fecha: date,
+     tecnicos_presentes: [],
+     cantidad_tecnicos: number,
+     actividades: [
+       {
+         actividad_id: uuid,
+         porcentaje_avance_hoy: number,
+         porcentaje_acumulado_nuevo: number
+       }
+     ],
+     descripcion_trabajo: text,
+     fotos: [],
+     hora_checkin: text,
+     hora_checkout: text
+   }
+
+2. When saving, for each activity in the array:
+   - Insert one record in subcontratos_reportes 
+     per activity OR store as JSON array
+   - Update subcontratos_actividades_proyecto
+     SET porcentaje_avance = porcentaje_acumulado_nuevo
+     WHERE id = actividad_id
+   - If porcentaje_acumulado_nuevo >= 100:
+     SET completada = true
+
+3. The supervisor approval email should list 
+   ALL activities worked that day with their 
+   individual progress:
+   "Actividades trabajadas:
+   • Cableado: +20% (Total: 80%)
+   • Montaje de equipos: +10% (Total: 10%)"
+
+4. In the project timeline, each report node 
+   should show all activities worked that day
+   with their individual advances.
+
+5. In the project detail screen, the activities 
+   progress section updates in real time showing 
+   accumulated % across all reports.

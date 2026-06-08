@@ -1,0 +1,71 @@
+Please build a web dashboard for the operations 
+supervisor at TAS El Salvador. It should be a 
+separate web page (not the mobile app) connected 
+to the same Supabase database.
+
+DESIGN:
+- Clean, professional dark theme
+- TAS CORP brand colors: 
+  Primary background: #1A1A1A (near black)
+  Secondary background: #2D2D2D (dark gray)
+  Accent: #CC0000 (TAS red)
+  Text primary: #FFFFFF (white)
+  Text secondary: #9E9E9E (gray)
+  Borders: #3D3D3D (dark gray)
+  Success badge: #2E7D32 (dark green)
+  Warning badge: #F57F17 (amber)
+- Responsive — works on desktop and tablet
+- Spanish language throughout
+
+SECTION 1 — KPI Cards at the top:
+- Total reports today
+- Total reports this week
+- Total hours worked today (sum of hora_salida 
+  minus hora_entrada across all technicians)
+- Reports with pending quotations
+- Average NPS score
+
+SECTION 2 — Filters bar:
+- Filter by date range (today, this week, 
+  this month, custom)
+- Filter by technician name
+- Filter by client name
+- Filter by service status
+- Filter by service type
+
+SECTION 3 — Reports table:
+Columns: #Reporte, Fecha, Técnico, Cliente, 
+Tipo de servicio, Trabajo realizado (truncated), 
+Horas (entrada-salida), Estado (color badge), 
+Cotización (yes/no badge), NPS
+- Click any row to expand full report detail
+- Export to CSV button
+
+SECTION 4 — Technician summary table:
+- Technician name
+- Number of visits today
+- Total hours worked
+- Average NPS score
+- Number of pending quotations
+
+SECTION 5 — AI Assistant bot:
+A floating chat button in the bottom right corner 
+that opens a chat widget. The supervisor can ask:
+- "¿Qué hizo Alex García hoy?"
+- "¿Cuántas visitas tuvo Banco Agrícola este mes?"
+- "¿Qué reportes tienen cotizaciones pendientes?"
+- "Resume el reporte #7"
+
+The bot fetches data from Supabase and uses 
+Claude API to answer in natural Spanish.
+
+SECTION 6 — Technician hours chart:
+A bar chart showing hours worked per technician 
+for the selected date range.
+
+Connect to Supabase using existing secrets:
+SUPABASE_URL, SUPABASE_ANON_KEY, ANTHROPIC_API_KEY
+
+Host as a standalone web page accessible from 
+any browser at a public URL. Give me the public 
+URL when done.

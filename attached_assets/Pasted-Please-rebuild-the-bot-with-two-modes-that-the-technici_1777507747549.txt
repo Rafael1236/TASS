@@ -1,0 +1,58 @@
+Please rebuild the bot with two modes that the technician 
+chooses at the start:
+
+MODE 1 - QUICK (recommended):
+The bot asks the technician to send a single voice note 
+or text message describing everything about the visit. 
+Then the system uses Claude AI to extract and map the 
+information to these exact fields:
+- tecnico_nombre (who did the service)
+- cliente_nombre (client name)
+- numero_llamada (SAP call number)
+- numero_proyecto (project number)
+- tipo_servicio (one or more of: Mantenimiento, Soporte, 
+Instalación, Reparación, Cableado, Programación, 
+Capacitación, Garantía, Estudio, Entrega)
+- trabajo_realizado (description of work done)
+- reporte_repuestos (list of materials used, each with 
+quantity and description)
+- reporte_tecnicos (auxiliary technicians, each with name 
+and whether they are subcontract: true/false)
+- hora_entrada (entry time HH:MM)
+- hora_salida (exit time HH:MM)
+- estado_servicio (one of: Terminado, Pendiente de 
+repuesto, Requiere visita adicional, En proceso)
+- hay_cotizacion (true/false - whether there is something 
+to quote)
+- descripcion_cotizacion (if hay_cotizacion is true)
+- observaciones (additional notes for supervisor)
+
+After extraction, the bot shows a summary card with all 
+filled fields and asks only for the missing required ones 
+one by one. Required fields are: tecnico_nombre, 
+cliente_nombre, numero_llamada, tipo_servicio, 
+trabajo_realizado, estado_servicio.
+
+MODE 2 - GUIDED:
+The bot asks each field one by one in Spanish using 
+chips for fixed choices and free text for open answers. 
+Same fields as above in this order: tecnico_nombre, 
+cliente_nombre, numero_llamada, numero_proyecto, 
+tipo_servicio, trabajo_realizado, reporte_repuestos, 
+reporte_tecnicos, es_subcontrato, hora_entrada, 
+hora_salida, estado_servicio, hay_cotizacion, 
+descripcion_cotizacion (only if hay_cotizacion), 
+observaciones.
+
+BOTH MODES:
+- WhatsApp dark UI look and feel
+- Microphone button that records audio
+- Typing indicator between bot messages
+- Final summary card showing all fields before confirm
+- Confirm and Edit buttons at the end
+- All bot messages in Spanish
+- The technician can send multiple voice notes or text 
+messages and the system accumulates the information
+
+For now use a placeholder for the Claude AI call - 
+we will connect the real API key later.

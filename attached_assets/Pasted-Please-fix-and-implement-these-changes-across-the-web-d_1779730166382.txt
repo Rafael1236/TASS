@@ -1,0 +1,120 @@
+Please fix and implement these changes 
+across the web dashboard:
+
+CHANGE 1 — Dark/Light toggle on login page:
+Add a dark/light mode toggle button on the 
+dashboard login page (/dashboard).
+- Position: top right corner of the login page
+- Icon: 🌙 dark mode, ☀️ light mode
+- Same behavior as the existing toggle in 
+  other dashboard pages
+- Save preference in localStorage
+- Apply immediately to the login page itself
+
+CHANGE 2 — Date filter in supervisor dashboard:
+In the supervisor dashboard, add a date 
+range filter with calendar picker that 
+applies to all report sections.
+
+CRITICAL RULE for pending boletas:
+- Boletas with estado_revision = 
+  'pendiente_revision' MUST always appear 
+  in the supervisor dashboard regardless 
+  of the date filter selected
+- The date filter should only affect 
+  reviewed/completed boletas
+- Add a note above pending boletas:
+  "Las boletas pendientes siempre se 
+  muestran independientemente del filtro"
+- Never hide a pending boleta because 
+  of a date filter — this is a critical 
+  safety requirement
+
+CHANGE 3 — Fix business days counter 
+in subcontract assignment:
+In the project assignment form in 
+/dashboard/gestion/subcontratos, fix 
+the days counter:
+
+CORRECT LOGIC:
+- Count only Monday to Friday
+- BOTH start date AND end date are 
+  INCLUSIVE in the count
+- Example: Monday May 11 to Friday May 15 
+  = 5 business days (not 4)
+- Example: Monday May 11 to Monday May 18 
+  = 6 business days
+- Formula: count all days between start 
+  and end date inclusive, excluding 
+  Saturdays (day 6) and Sundays (day 0)
+- Show as: "X días hábiles"
+- Auto-calculate when either date changes
+- Allow supervisor to manually override 
+  if needed
+
+CHANGE 4 — Add "Otros" activity in 
+subcontract assignment:
+In the activities selection step of the 
+subcontract project assignment form, add 
+a special "Otros" option at the end of 
+the activities list:
+- Checkbox labeled "Otros"
+- When checked: show a text input field
+  Placeholder: "Describe la actividad..."
+  Required if "Otros" is checked
+- Save as a custom activity with the 
+  text entered by the supervisor
+- This allows supervisors to add any 
+  activity not in the predefined catalog
+
+Also add "Otros" to the 
+subcontratos_actividades_catalogo table:
+INSERT INTO subcontratos_actividades_catalogo 
+(nombre, descripcion) VALUES 
+('Otros', 'Actividad personalizada');
+
+CHANGE 5 — Show supervisor in subcontract 
+project card:
+In the subcontract project cards shown in 
+the gerente_operaciones dashboard, make 
+the assigned supervisor clearly visible:
+
+In each project card add:
+- Supervisor badge/label showing 
+  supervisor_nombre prominently
+- Position: below the project name 
+  and client name
+- Style: colored pill badge in blue
+  "👤 Supervisor: [nombre]"
+- Also show in the project detail view
+- Also show in the pending approvals cards
+
+CHANGE 6 — Fix dark/light mode in 
+/dashboard/gestion:
+The dark/light mode toggle is not working 
+correctly in the gestion module.
+
+Please fix:
+1. Make sure the gestion module reads the 
+   same theme from localStorage as all 
+   other dashboard pages
+2. Apply the CSS variables correctly to 
+   all components in:
+   /dashboard/gestion
+   /dashboard/gestion/subcontratos
+   /dashboard/gestion/tecnicos
+   /dashboard/gestion/clientes
+   /dashboard/gestion/usuarios
+3. The theme toggle in the navbar must 
+   work consistently across ALL dashboard 
+   pages including gestion
+4. When theme changes in any page it 
+   should immediately update all visible 
+   elements without requiring a page reload
+5. Test specifically that these elements 
+   change correctly in gestion:
+   - Sidebar background
+   - Table rows
+   - Modal backgrounds
+   - Form inputs
+   - Buttons and badges

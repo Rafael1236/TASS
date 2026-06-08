@@ -1,0 +1,80 @@
+Please make these two changes to the TAS Bot Técnico app:
+
+CHANGE 1 — Subcontract questions:
+Replace the current yes/no subcontract question with 
+these three questions in sequence:
+
+a. "¿Hay personal subcontratado trabajando en el sitio?" 
+   (chips: Sí / No)
+b. Only if Sí: "¿Cuál es el nombre de la empresa 
+   subcontratista?"
+   (free text)
+c. Only if Sí: "¿Cuántas personas del subcontrato 
+   están en el sitio?"
+   (free text, must be a number)
+
+Save these to reporte_tecnicos table fields:
+- es_subcontrato: true/false
+- empresa_subcontrato: company name
+- cantidad_personas: number of people
+
+CHANGE 2 — Client history with smart dropdown:
+Add a "Consultar cliente" button in the app header 
+that opens a search screen.
+
+SEARCH BEHAVIOR:
+- As the technician types, show a dropdown of 
+  matching clients from Supabase clientes table
+- Group clients with sucursales like this:
+  Banco Agrícola
+    ↳ Soyapango
+    ↳ Santa Ana
+  FAO
+  Ministerio de Salud
+    ↳ Hospital Bloom
+- Parent client shows all history combined
+- Specific sucursal shows only that location
+
+AUTOMATIC PARENT/BRANCH DETECTION (backend only, 
+no questions to technician):
+When saving a new client from a report, the server 
+should automatically:
+1. Extract the base name (first 2-3 significant words)
+2. Check if a client with that base name already 
+   exists in clientes table
+3. If yes: link the new client as a sucursal 
+   (es_sucursal: true, cliente_padre_id: parent id,
+   sucursal: the differentiating part of the name)
+4. If no: create as a new standalone client
+5. Never ask the technician about this — fully 
+   automatic in the backend
+
+HISTORY DISPLAY:
+When technician selects a client or sucursal:
+1. Query last 3 reports from Supabase for that 
+   client (or all sucursales if parent selected)
+   ordered by fecha DESC
+2. Send data to Claude to generate summary in 
+   this exact format:
+
+"📋 [cliente_nombre] — Historial de servicios
+
+[DD MMMM YYYY] — [tecnico_nombre]
+[trabajo_realizado]. [observaciones if not empty]
+
+[DD MMMM YYYY] — [tecnico_nombre]
+[trabajo_realizado]. [observaciones if not empty]
+
+[DD MMMM YYYY] — [tecnico_nombre]
+[trabajo_realizado]. [observaciones if not empty]"
+
+3. Display as a dark WhatsApp-style card in chat
+4. If no history: "No se encontraron visitas 
+   anteriores para este cliente."
+
+Add new API endpoints:
+- GET /api/clients/search?q=texto — returns 
+  matching clients grouped by parent/sucursal
+- POST /api/client-history — receives cliente_id 
+  or cliente_padre_id, queries Supabase, calls 
+  Claude, returns formatted summary

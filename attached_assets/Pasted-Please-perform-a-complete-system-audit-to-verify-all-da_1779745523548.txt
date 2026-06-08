@@ -1,0 +1,142 @@
+Please perform a complete system audit to 
+verify all data flows are working correctly 
+between the app, backend and Supabase.
+
+Create a diagnostic endpoint that tests 
+every critical connection:
+
+GET /api/diagnostics
+
+This endpoint should test and return 
+results for:
+
+1. DATABASE CONNECTION:
+   - Can connect to Supabase
+   - All 16 tables exist and are accessible
+   - RLS policies allow read/write
+
+2. AUTHENTICATION FLOWS:
+   Test login for each user type:
+   a. Tecnico: query usuarios where 
+      rol = 'tecnico' AND activo = true
+      Verify password check works
+   b. Supervisor: same but rol = 'supervisor'
+   c. Gerente: rol = 'gerente_operaciones'
+   d. Comercial: rol = 'gerente_comercial'
+   e. Subcontratista: query 
+      subcontratos_usuarios where activo = true
+   f. Admin: rol = 'admin'
+   
+   For each: return success/fail and 
+   count of users found
+
+3. BOLETA FORM — verify all fields save:
+   Create a test boleta insert with ALL 
+   fields and verify it saves correctly:
+   - numero_llamada
+   - numero_proyecto  
+   - cliente_id (must reference clientes)
+   - cliente_nombre
+   - tecnico_nombre
+   - tipo_servicio (array)
+   - trabajo_realizado
+   - equipos_instalados
+   - estado_servicio
+   - hora_entrada / hora_salida
+   - observaciones
+   - hay_cotizacion
+   - descripcion_cotizacion
+   - correo_cliente
+   - supervisor_id (must reference usuarios)
+   - supervisor_nombre
+   - placa_vehiculo
+   - es_reproceso
+   - estado_revision
+   - firma_cliente_url
+   - fotos (array)
+   Then DELETE the test record.
+
+4. REPORTE_TECNICOS — verify auxiliary 
+   technicians save correctly with:
+   - reporte_id
+   - nombre
+   - hora_entrada / hora_salida
+   - es_principal
+   - es_subcontrato
+   - total_horas
+
+5. REPORTE_REPUESTOS — verify materials 
+   save correctly
+
+6. SUBCONTRATOS FLOW:
+   a. Can read subcontratos_proyectos
+   b. Can read subcontratos_actividades_proyecto
+   c. Can insert subcontratos_reportes
+   d. Can insert subcontratos_fotos
+   e. Verify dias counter calculation is correct
+
+7. CLIENT SEARCH:
+   Verify clientes table returns results 
+   for common searches
+
+8. SUPERVISOR ASSIGNMENT:
+   Verify that when a boleta is created 
+   with supervisor_id, it appears in the 
+   correct supervisor's dashboard query:
+   SELECT * FROM reportes 
+   WHERE supervisor_id = [id] 
+   AND estado_revision = 'pendiente_revision'
+
+9. EMAIL TRIGGERS:
+   Verify Resend is configured and 
+   EMAIL_TEST_MODE secret exists
+
+10. USER CREATION FLOW:
+    Verify that creating a new user in 
+    /dashboard/gestion/usuarios correctly 
+    inserts into usuarios table with all 
+    required fields:
+    - nombre, usuario, correo
+    - rol, departamento
+    - activo = true
+    - password_hash or default password
+
+11. SUBCONTRACT USER LOGIN:
+    Verify subcontratos_usuarios table 
+    has users with activo = true and 
+    that login flow checks this table 
+    as fallback
+
+RETURN FORMAT:
+{
+  "timestamp": "2026-05-25T...",
+  "overall": "pass" | "fail" | "partial",
+  "tests": [
+    {
+      "name": "Database Connection",
+      "status": "pass" | "fail",
+      "details": "...",
+      "count": 0,
+      "error": null
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 2,
+    "total": 10
+  }
+}
+
+Also fix any issues found during the audit.
+
+ADDITIONALLY fix this specific bug:
+User carlos.campos exists in usuarios table 
+with activo = true and rol = 'tecnico' but 
+login returns "Usuario no encontrado o inactivo".
+
+Debug the exact login query and fix it.
+The login endpoint must query:
+SELECT * FROM usuarios 
+WHERE usuario = $1 AND activo = true
+And verify the username comparison is 
+case-sensitive/insensitive correctly.

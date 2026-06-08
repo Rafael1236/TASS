@@ -1,0 +1,167 @@
+Please completely restructure the technician 
+report form. Replace the conversational chat 
+bot with a structured visual form similar to 
+the subcontract daily report form.
+
+IMPORTANT: Keep the WhatsApp-style chat as 
+the home screen greeting only. The "Nueva 
+Boleta" button now opens this new structured 
+form instead of the chat flow.
+
+GENERAL DESIGN:
+- Same dark theme as the rest of the app
+- Scrollable single page form divided into 
+  clearly labeled sections
+- Each section has a header with number and 
+  title: "1. Identificación", "2. Detalle 
+  del servicio", etc.
+- Progress indicator at top showing 
+  completion percentage
+- "Enviar Reporte" button fixed at bottom
+- Button stays disabled until required 
+  fields are filled
+- Required fields marked with red asterisk *
+
+SECTION 1 — Identificación:
+- Cliente * — searchable dropdown that queries 
+  clientes table in Supabase as user types
+  Shows grouped results with parent/branch 
+  hierarchy (existing client search logic)
+- Número de llamada SAP — text input
+  (optional — absence triggers alert flow)
+- Número de proyecto — text input (optional)
+- Tipo de servicio * — multi-select chips:
+  Mantenimiento, Soporte, Instalación, 
+  Reparación, Cableado, Programación, 
+  Capacitación, Garantía, Estudio, Entrega
+  Multiple chips can be selected (highlighted red)
+- Vehículo — dropdown with plates:
+  P3897A, P389AA, P62FA0, P62FFA, 
+  P62FF2, P62FAF, P5176A, P963771
+
+SECTION 2 — Detalle del servicio:
+Each field has a text area + microphone button.
+When mic is tapped: record audio → Whisper 
+transcribes → text appears in field.
+User can edit text after transcription.
+
+Fields:
+- Descripción del trabajo realizado * 
+  (multiline text + 🎤 mic button)
+- Equipos instalados 
+  (multiline text + 🎤 mic button)
+- Materiales y repuestos utilizados
+  (multiline text + 🎤 mic button)  
+- Observaciones
+  (multiline text + 🎤 mic button)
+
+MIC BUTTON BEHAVIOR:
+- Tap mic → button turns red + pulsing
+- Recording indicator with timer
+- Tap again to stop → transcribing spinner
+- Text appears in field
+- User can edit or re-record
+
+SECTION 3 — Personal en sitio:
+
+TECHNICIAN PRINCIPAL (auto-filled, not editable):
+- Name: from logged-in user (read-only)
+- Hora entrada * — time picker (HH:MM)
+- Hora salida * — time picker (HH:MM)
+- Auto-calculated: "X horas trabajadas"
+
+TÉCNICOS AUXILIARES TAS:
+- "Agregar técnico TAS" button
+- Opens searchable dropdown from tecnicos 
+  table in Supabase
+- Each added technician shows as a card:
+  ┌─────────────────────────────────┐
+  │ 👤 Carlos Enrique Perez Beltran │ ✕
+  │ Entrada: [08:00] Salida: [14:00]│
+  │ Total: 6 horas                  │
+  └─────────────────────────────────┘
+- Can add unlimited technicians
+- Each has their own entrada/salida time picker
+- Auto-calculates hours for each
+- Bottom summary: "Total horas equipo: X horas"
+
+SUBCONTRATO:
+- "¿Hubo personal subcontratado?" Sí/No chips
+- If Sí: number input "¿Cuántas personas?"
+
+SECTION 4 — Estado del servicio:
+- Large chips — only one selectable:
+  ● Terminado (green when selected)
+  ● En proceso (amber when selected)
+  * Required
+
+SECTION 5 — Cotización:
+- "¿Hay algo por cotizar?" Sí/No chips
+- If Sí: text area + 🎤 mic button
+  "Describe qué hay por cotizar"
+
+SECTION 6 — Evidencia:
+- Fotos adjuntas:
+  Grid showing attached photos
+  "📷 Agregar foto" button (camera or gallery)
+  Photos shown as thumbnails with delete option
+- Firma del cliente:
+  If no signature: "✍️ Capturar firma" button
+  If signed: shows signature thumbnail + 
+  "✓ Firma capturada" + option to re-sign
+
+SUBMIT BUTTON:
+Fixed at bottom of screen:
+"Enviar Reporte" — red #CC0000
+Disabled (gray) until these are filled:
+- Cliente
+- Tipo de servicio  
+- Descripción del trabajo
+- Estado del servicio
+- Hora entrada and hora salida (technician)
+
+When tapped:
+- Validate all required fields
+- Show loading: "Enviando reporte..."
+- Save to Supabase (existing logic)
+- Send client email (existing logic)
+- Show success: "✅ Reporte enviado correctamente"
+- Option: "Nuevo reporte" or "Ir al inicio"
+
+TECHNICIAN HOURS STORAGE:
+Save to reporte_tecnicos table:
+- Technician principal: 
+  nombre, hora_entrada, hora_salida, 
+  es_subcontrato: false, es_principal: true
+- Each auxiliary technician:
+  nombre, hora_entrada, hora_salida,
+  es_subcontrato: false, es_principal: false
+- Add total_horas calculated field
+
+Also add to reportes table:
+- equipos_instalados: text field
+- total_horas_equipo: numeric
+
+Run these migrations in Supabase:
+ALTER TABLE reportes 
+ADD COLUMN IF NOT EXISTS equipos_instalados text;
+ALTER TABLE reportes
+ADD COLUMN IF NOT EXISTS total_horas_equipo numeric;
+ALTER TABLE reporte_tecnicos
+ADD COLUMN IF NOT EXISTS es_principal boolean default false;
+ALTER TABLE reporte_tecnicos
+ADD COLUMN IF NOT EXISTS total_horas numeric;
+
+REMOVE THE OLD CHAT BOT FLOW:
+- The "Nueva Boleta" button should open 
+  this new form directly
+- Remove the Quick/Guided mode selection
+- Remove the conversational chat for reports
+- Keep the client history consultation 
+  chat as is (that stays unchanged)
+- Keep the home screen greeting message
+
+The new form should feel like a professional 
+mobile form app — clean, fast, intuitive.
+Similar look and feel to the subcontract 
+daily report form already built.

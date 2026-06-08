@@ -1,0 +1,74 @@
+Please add a LOGIN SCREEN to the TAS Bot app 
+that appears after the company selection screen 
+when the user taps TAS.
+
+LOGIN SCREEN DESIGN:
+- Same dark theme as the rest of the TAS app
+- TAS logo centered at top
+- Title: "Bienvenido a TAS"
+- Subtitle: "Ingresa tus credenciales"
+- Username field with placeholder: 
+  "Usuario (nombre.apellido)"
+- Password field with placeholder: "Contraseña"
+  with show/hide password toggle
+- "Iniciar sesión" button in red #CC0000
+- Small text below: "¿Olvidaste tu contraseña? 
+  Contacta a tu supervisor"
+- Footer: "Franquicia operada por [logo]"
+
+AUTHENTICATION LOGIC:
+1. When technician enters username and password,
+   call a new endpoint POST /api/auth/login
+2. The server queries Supabase tecnicos table 
+   where usuario = username AND activo = true
+3. For now use a simple password check:
+   - Default password for all: "TAS2026!"
+   - Store passwords as plain text for now
+     (we will add proper hashing later)
+4. If credentials match return:
+   {
+     success: true,
+     tecnico: {
+       id: uuid,
+       nombre: "Carlos Perez",
+       usuario: "carlos.perez",
+       departamento: "MANTO"
+     }
+   }
+5. If wrong credentials return error:
+   { success: false, message: "Usuario o 
+   contraseña incorrectos" }
+
+AFTER LOGIN:
+- Store the logged-in technician in app state
+- Navigate to the existing TAS home screen
+- The bot should greet them by first name:
+  "Buenos días, Carlos. ¿Listo para registrar 
+  tu primera visita del día?"
+- The tecnico_nombre field in all reports 
+  should be filled automatically from the 
+  logged-in user — never ask for it again
+- Show the technician's name in the header 
+  of the home screen: "Hola, Carlos 👋"
+
+LOGOUT:
+- Add a small logout icon in the top right 
+  of the home screen header
+- On tap: show confirmation "¿Cerrar sesión?"
+  with Sí / Cancelar options
+- On confirm: clear session and return to 
+  company selection screen
+
+NAVIGATION FLOW:
+Company Selection → TAS → Login Screen → 
+Home Screen → Bot / Consultar Cliente
+
+SESSION PERSISTENCE:
+- Keep the session active while the app is open
+- If app is closed and reopened, show login 
+  again (no persistent sessions for now)
+
+Also update the report bot so that:
+- tecnico_nombre is pre-filled from logged-in user
+- The bot never asks "¿Cuál es tu nombre?"
+- In the greeting use their first name only

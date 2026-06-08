@@ -1,0 +1,115 @@
+Please implement these two things together:
+
+PART 1 — ROLE-BASED ACCESS:
+Update the login system so that after 
+authentication, the app shows different 
+screens based on the user's role:
+
+1. Query the "rol" field from the tecnicos 
+   table after login
+2. Role: "tecnico" → show existing home screen 
+   with: Nueva Boleta + Consultar Cliente
+3. Role: "admin" → show home screen with 
+   THREE modules:
+   - 📋 Nueva Boleta de Servicio
+   - 🔍 Consultar Cliente  
+   - 🏗️ Subcontratos
+4. Role: "subcontratista" → show ONLY:
+   - 🏗️ Módulo de Subcontratos
+   (no boletas, no client history)
+
+Also update the developer shortcut 
+(5 taps on logo) to use hernan.pinaud 
+which has role "admin" — so all 3 modules 
+appear in dev mode.
+
+PART 2 — SUBCONTRACTS MODULE:
+Build a complete subcontracts module accessible 
+from the home screen when user has admin or 
+subcontratista role.
+
+SCREEN 1 — Project List:
+- Dark theme matching TAS app style
+- Title: "Mis Proyectos" or "Proyectos Asignados"
+- List of assigned projects showing:
+  - Project name
+  - Client name
+  - Days counter with color bar:
+    Green 0-70%, Amber 70-90%, Red 90-100%
+  - Status badge: Activo / Completado / Atrasado
+  - Last activity date
+- "+" button to create new daily report
+- Each project tappable to see detail
+
+SCREEN 2 — Project Detail:
+- Project name and client
+- Days progress bar (dias_utilizados / 
+  dias_maximos) with counter "X de Y días"
+- Activities progress section:
+  List of all assigned activities with 
+  individual progress bars showing % complete
+- Timeline tab: chronological list of all 
+  daily reports for this project
+  Each item shows: date, technicians present,
+  activity worked, % advance, status badge
+  (Aprobado ✓ / Rechazado ✗ / Pendiente ⏳)
+  Tap to expand full report with photos
+- "Nuevo Reporte Diario" button at bottom
+
+SCREEN 3 — New Daily Report:
+Step by step form:
+1. Activity selector — dropdown of activities 
+   assigned to this project
+2. Technicians present today:
+   - Dropdown with previously registered 
+     technicians for this company
+   - "+" to add new technician name
+   - Show count: "3 técnicos hoy"
+3. Check-in photo — REQUIRED
+   Camera button, must take or upload photo
+4. Work description — text or audio (same 
+   Whisper integration as main bot)
+5. Progress percentage for selected activity
+   Slider 0-100% with current value shown
+6. Additional evidence photos — optional, 
+   multiple photos allowed
+7. Check-out photo — optional
+8. Submit button: "Enviar reporte"
+
+AFTER SUBMITTING REPORT:
+- Save to subcontratos_reportes table
+- Save photos to subcontratos_fotos table
+- Update dias_utilizados in project
+- Update porcentaje_avance in activity
+- Send email via Resend to supervisor:
+  Subject: "Nuevo reporte de avance — 
+  [proyecto] — [fecha]"
+  Content: technicians present, activity, 
+  % advance, work description, photo thumbnails
+  Button: "Revisar y aprobar en el dashboard"
+- Show success message to subcontractor
+
+DAYS COUNTER ALERTS:
+- When dias_utilizados reaches 80% of 
+  dias_maximos: send alert email to supervisor
+- When dias_utilizados reaches 100%: send 
+  urgent alert email
+- In project list show red pulsing badge 
+  when over 90%
+
+NAVIGATION:
+- From home screen: tap "Subcontratos" card
+- Back button returns to home screen
+- All screens follow same dark TAS theme
+- Footer "Franquicia operada por" on all screens
+
+NEW API ENDPOINTS NEEDED:
+- GET /api/subcontratos/proyectos?usuario_id=
+- GET /api/subcontratos/proyecto/:id
+- POST /api/subcontratos/reporte
+- GET /api/subcontratos/tecnicos?empresa_id=
+- POST /api/subcontratos/tecnico (add new)
+
+Connect to existing Supabase secrets.
+Use existing Resend for emails.
+Use existing Whisper for audio in descriptions.

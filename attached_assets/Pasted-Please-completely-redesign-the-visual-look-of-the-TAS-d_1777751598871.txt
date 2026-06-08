@@ -1,0 +1,93 @@
+Please completely redesign the visual look of 
+the TAS dashboards and home screen with a modern, 
+premium app aesthetic inspired by Uber, Airbnb 
+and Waymo. The WhatsApp-style chat bot must 
+remain EXACTLY as is — do not touch it.
+
+BRAND COLORS:
+- Primary background: #0A0A0A (near black)
+- Secondary background: #141414 (dark)
+- Card background: #1C1C1C (dark gray)
+- Border color: #2A2A2A
+- Primary accent: #CC0000 (TAS red)
+- Secondary accent: #E8E8E8 (light gray)
+- Text primary: #FFFFFF
+- Text secondary: #9A9A9A
+- Success: #22C55E
+- Warning: #F59E0B
+- Danger: #EF4444
+
+TYPOGRAPHY:
+- Font: Inter or SF Pro (system font stack)
+- Headlines: 600-700 weight
+- Body: 400-500 weight
+- Labels: uppercase, letter-spacing: 0.1em, 
+  font-size: 11px
+
+DESIGN PRINCIPLES (Uber/Airbnb style):
+- Lots of negative space — never cluttered
+- Cards with subtle borders, no heavy shadows
+- Smooth transitions and hover states
+- Pill-shaped badges and status indicators
+- Thin, elegant dividers
+- Icons should be minimal and consistent
+- Numbers and stats displayed large and bold
+- Micro-interactions on hover (subtle scale, 
+  color shift)
+
+HOME SCREEN (app del técnico — not the chat):
+- Full screen dark background #0A0A0A
+- TAS logo centered at top (will provide PNG)
+- Subtitle: "Tecnología, Acceso & Seguridad" 
+  in gray, small caps
+- Two large action cards (not buttons):
+  Each card: dark #1C1C1C, subtle red left border,
+  large icon top left, title bold white, 
+  subtitle gray, arrow right icon
+  Card 1: 📋 Nueva Boleta — "Registrar visita técnica"
+  Card 2: 🔍 Consultar Cliente — "Historial de servicios"
+- Bottom: version number and date in tiny gray text
+- Feels like opening Uber — clean, confident, fast
+
+OPERATIONS DASHBOARD:
+- Top navbar: #0A0A0A with TAS logo left, 
+  "Panel Operaciones" title center, 
+  "Vista Comercial →" link right
+- KPI cards: dark cards with large bold numbers,
+  red accent for primary metric, subtle borders
+- Filter bar: pill-shaped inputs, minimal style
+- Table: no heavy borders, alternating subtle 
+  row colors, status badges as colored pills
+- Charts: dark background, red as primary color,
+  gray as secondary
+- GPS section: dark card with map full width
+- Overall feel: Bloomberg Terminal meets Uber
+
+COMMERCIAL DASHBOARD:
+- Same design system as operations
+- Opportunity cards instead of table rows
+  for pending quotations — card style like 
+  Airbnb listings
+- Status badges: pill shaped, color coded
+- KPI numbers extra large, bold
+- Conversion rate shown as a circular progress 
+  indicator
+
+NAVIGATION:
+- Smooth page transitions
+- Active states clearly visible
+- Hover states on all interactive elements
+
+Please also add the TAS logo to:
+- Operations dashboard navbar (top left)
+- Commercial dashboard navbar (top left)
+- Home screen (centered, prominent)
+
+For the logo use this URL as placeholder 
+until we provide the PNG file:
+data:image/svg+xml — create a simple TAS 
+text logo in red and white as fallback.
+
+Apply these changes to all dashboard pages 
+and the home screen. The chat interface 
+must remain completely unchanged.

@@ -1,0 +1,513 @@
+-- ============================================================
+-- DATOS DE PRUEBA PILOTO REAL — TAS SISTEMA DIGITAL
+-- Usa clientes reales de la base de datos
+-- ============================================================
+
+-- ============================================================
+-- SUBCONTRATOS — técnicos de la empresa
+-- ============================================================
+INSERT INTO subcontratos_tecnicos (empresa_id, nombre)
+SELECT id, unnest(ARRAY['Roberto Flores','Juan Martínez','Carlos Díaz','Miguel Rodríguez','Luis Hernández'])
+FROM subcontratos_empresas LIMIT 1;
+
+-- ============================================================
+-- PROYECTOS SUBCONTRATO
+-- ============================================================
+
+-- Proyecto 1 — Alexander Menjivar — EN RIESGO
+INSERT INTO subcontratos_proyectos (
+  id, nombre, numero_proyecto, numero_llamada, cliente_nombre,
+  empresa_id, supervisor_id, supervisor_nombre, supervisor_correo,
+  fecha_inicio, fecha_fin_estimada, dias_maximos, estado
+)
+SELECT 'c1000000-0000-0000-0000-000000000001',
+  'Instalación CCTV ARABELA LOGISTICS', '7001', '9901',
+  'ARABELA LOGISTICS S.A DE C.V',
+  se.id, u.id, u.nombre, u.correo,
+  current_date - 13, current_date + 2, 15, 'activo'
+FROM subcontratos_empresas se, usuarios u
+WHERE u.usuario = 'alexander.menjivar' LIMIT 1;
+
+-- Proyecto 2 — Sixto Pacas — EN PROGRESO
+INSERT INTO subcontratos_proyectos (
+  id, nombre, numero_proyecto, numero_llamada, cliente_nombre,
+  empresa_id, supervisor_id, supervisor_nombre, supervisor_correo,
+  fecha_inicio, fecha_fin_estimada, dias_maximos, estado
+)
+SELECT 'c1000000-0000-0000-0000-000000000002',
+  'Cableado estructurado ALAS DORADAS', '7002', '9902',
+  'ALAS DORADAS S.A DE C.V',
+  se.id, u.id, u.nombre, u.correo,
+  current_date - 5, current_date + 10, 15, 'activo'
+FROM subcontratos_empresas se, usuarios u
+WHERE u.usuario = 'sixto.pacas' LIMIT 1;
+
+-- Proyecto 3 — Edgardo Mena — POR INICIAR
+INSERT INTO subcontratos_proyectos (
+  id, nombre, numero_proyecto, numero_llamada, cliente_nombre,
+  empresa_id, supervisor_id, supervisor_nombre, supervisor_correo,
+  fecha_inicio, fecha_fin_estimada, dias_maximos, estado
+)
+SELECT 'c1000000-0000-0000-0000-000000000003',
+  'Sistema alarmas CROWLEY LOGISTICS', '7003', '9903',
+  'CROWLEY LOGISTICS EL SALVADOR S.A DE C.V',
+  se.id, u.id, u.nombre, u.correo,
+  current_date + 3, current_date + 13, 10, 'activo'
+FROM subcontratos_empresas se, usuarios u
+WHERE u.usuario = 'edgardo.mena' LIMIT 1;
+
+-- Proyecto 4 — Alexander Menjivar — VENCIDO
+INSERT INTO subcontratos_proyectos (
+  id, nombre, numero_proyecto, numero_llamada, cliente_nombre,
+  empresa_id, supervisor_id, supervisor_nombre, supervisor_correo,
+  fecha_inicio, fecha_fin_estimada, dias_maximos, estado
+)
+SELECT 'c1000000-0000-0000-0000-000000000004',
+  'Control acceso CONDOMINIO COSTA REAL', '7004', '9904',
+  'CONDOMINIO COSTA REAL RESORT & VILLAS',
+  se.id, u.id, u.nombre, u.correo,
+  current_date - 20, current_date - 3, 15, 'activo'
+FROM subcontratos_empresas se, usuarios u
+WHERE u.usuario = 'alexander.menjivar' LIMIT 1;
+
+-- ============================================================
+-- ACTIVIDADES POR PROYECTO
+-- ============================================================
+INSERT INTO subcontratos_actividades_proyecto (proyecto_id, nombre_actividad, porcentaje_avance, completada) VALUES
+  ('c1000000-0000-0000-0000-000000000001', 'Canalizado', 100, true),
+  ('c1000000-0000-0000-0000-000000000001', 'Cableado', 90, false),
+  ('c1000000-0000-0000-0000-000000000001', 'Montaje de equipos', 50, false),
+  ('c1000000-0000-0000-0000-000000000001', 'Configuraciones', 0, false),
+  ('c1000000-0000-0000-0000-000000000002', 'Canalizado', 100, true),
+  ('c1000000-0000-0000-0000-000000000002', 'Cableado', 40, false),
+  ('c1000000-0000-0000-0000-000000000002', 'Certificación', 0, false),
+  ('c1000000-0000-0000-0000-000000000003', 'Canalizado', 0, false),
+  ('c1000000-0000-0000-0000-000000000003', 'Instalación de alarmas', 0, false),
+  ('c1000000-0000-0000-0000-000000000003', 'Pruebas y commissioning', 0, false),
+  ('c1000000-0000-0000-0000-000000000004', 'Canalizado', 100, true),
+  ('c1000000-0000-0000-0000-000000000004', 'Instalación de control de acceso', 60, false),
+  ('c1000000-0000-0000-0000-000000000004', 'Configuraciones', 0, false);
+
+-- ============================================================
+-- REPORTES DIARIOS SUBCONTRATO
+-- ============================================================
+
+-- Proyecto 1 — 2 aprobados, 1 pendiente
+INSERT INTO subcontratos_reportes (
+  proyecto_id, usuario_id, fecha, hora_checkin, hora_checkout,
+  actividad_id, descripcion_trabajo, porcentaje_avance,
+  cantidad_tecnicos, tecnicos_presentes, estado
+)
+SELECT 'c1000000-0000-0000-0000-000000000001', su.id,
+  current_date - 10, '07:00', '17:00', sap.id,
+  'Canalizado completo piso 1 y 2. Se instalaron 80 metros de conduit EMT desde cuarto de telecomunicaciones hasta los puntos de cámara.',
+  100, 4, ARRAY['Roberto Flores','Juan Martínez','Carlos Díaz','Miguel Rodríguez'],
+  'aprobado'
+FROM subcontratos_usuarios su, subcontratos_actividades_proyecto sap
+WHERE su.usuario = 'roberto.flores'
+AND sap.proyecto_id = 'c1000000-0000-0000-0000-000000000001'
+AND sap.nombre_actividad = 'Canalizado' LIMIT 1;
+
+INSERT INTO subcontratos_reportes (
+  proyecto_id, usuario_id, fecha, hora_checkin, hora_checkout,
+  actividad_id, descripcion_trabajo, porcentaje_avance,
+  cantidad_tecnicos, tecnicos_presentes, estado
+)
+SELECT 'c1000000-0000-0000-0000-000000000001', su.id,
+  current_date - 5, '07:00', '17:00', sap.id,
+  'Tendido de cable UTP cat6. Se pasaron 15 tramos desde cuarto de telecomunicaciones. Se etiquetaron todos los cables en ambos extremos.',
+  60, 3, ARRAY['Roberto Flores','Juan Martínez','Luis Hernández'],
+  'aprobado'
+FROM subcontratos_usuarios su, subcontratos_actividades_proyecto sap
+WHERE su.usuario = 'roberto.flores'
+AND sap.proyecto_id = 'c1000000-0000-0000-0000-000000000001'
+AND sap.nombre_actividad = 'Cableado' LIMIT 1;
+
+INSERT INTO subcontratos_reportes (
+  proyecto_id, usuario_id, fecha, hora_checkin, hora_checkout,
+  actividad_id, descripcion_trabajo, porcentaje_avance,
+  cantidad_tecnicos, tecnicos_presentes, estado
+)
+SELECT 'c1000000-0000-0000-0000-000000000001', su.id,
+  current_date - 1, '07:00', '15:00', sap.id,
+  'Se instalaron 12 cámaras IP en piso 1 y 2. Se conectaron al switch PoE y se verificó imagen de todas las cámaras instaladas.',
+  50, 2, ARRAY['Roberto Flores','Juan Martínez'],
+  'pendiente'
+FROM subcontratos_usuarios su, subcontratos_actividades_proyecto sap
+WHERE su.usuario = 'roberto.flores'
+AND sap.proyecto_id = 'c1000000-0000-0000-0000-000000000001'
+AND sap.nombre_actividad = 'Montaje de equipos' LIMIT 1;
+
+-- Proyecto 2 — 1 pendiente
+INSERT INTO subcontratos_reportes (
+  proyecto_id, usuario_id, fecha, hora_checkin, hora_checkout,
+  actividad_id, descripcion_trabajo, porcentaje_avance,
+  cantidad_tecnicos, tecnicos_presentes, estado
+)
+SELECT 'c1000000-0000-0000-0000-000000000002', su.id,
+  current_date - 2, '07:00', '17:00', sap.id,
+  'Tendido de cable UTP cat6 en área de producción. Se instalaron 200 metros de cable y se marcaron todos los puntos de conexión.',
+  40, 3, ARRAY['Roberto Flores','Luis Hernández','Juan Martínez'],
+  'pendiente'
+FROM subcontratos_usuarios su, subcontratos_actividades_proyecto sap
+WHERE su.usuario = 'roberto.flores'
+AND sap.proyecto_id = 'c1000000-0000-0000-0000-000000000002'
+AND sap.nombre_actividad = 'Cableado' LIMIT 1;
+
+-- Proyecto 4 — 1 pendiente vencido
+INSERT INTO subcontratos_reportes (
+  proyecto_id, usuario_id, fecha, hora_checkin, hora_checkout,
+  actividad_id, descripcion_trabajo, porcentaje_avance,
+  cantidad_tecnicos, tecnicos_presentes, estado
+)
+SELECT 'c1000000-0000-0000-0000-000000000004', su.id,
+  current_date - 4, '08:00', '16:00', sap.id,
+  'Instalación de lectores biométricos en accesos principales. Se instalaron 4 lectores y se programaron 30 usuarios.',
+  60, 2, ARRAY['Roberto Flores','Carlos Díaz'],
+  'pendiente'
+FROM subcontratos_usuarios su, subcontratos_actividades_proyecto sap
+WHERE su.usuario = 'roberto.flores'
+AND sap.proyecto_id = 'c1000000-0000-0000-0000-000000000004'
+AND sap.nombre_actividad = 'Instalación de control de acceso' LIMIT 1;
+
+-- ============================================================
+-- BOLETAS TAS — con clientes reales
+-- ============================================================
+
+-- LLAMADA 9901 — ARABELA LOGISTICS — combinada con subcontrato
+-- Cliente CON correo: krissia.barrera@arabela.com
+
+-- Boleta 1 — Revisada — Alexander — hace 12 días
+INSERT INTO reportes (
+  numero_llamada, numero_proyecto, cliente_id, cliente_nombre,
+  tecnico_nombre, tipo_servicio, trabajo_realizado, estado_servicio,
+  hora_entrada, hora_salida, observaciones, hay_cotizacion,
+  validado, estado_revision, es_reproceso, supervisor_nombre,
+  supervisor_id, fecha, created_at, revisado_at, tiempo_revision_minutos
+)
+SELECT '9901', '7001',
+  c.id, c.nombre_comercial,
+  'Felix Eduardo Ramirez Pineda', ARRAY['Instalación'],
+  'Inspección inicial del sistema CCTV en instalaciones de la empresa. Se identificaron 20 puntos de cámara y se levantó inventario completo del cableado existente.',
+  'Terminado', '07:00', '11:00',
+  'Se coordinó con el jefe de seguridad para acceso a todas las áreas.',
+  false, true, 'revisada', false,
+  u.nombre, u.id,
+  current_date - 12, now() - interval '12 days',
+  now() - interval '11 days 22 hours', 25
+FROM clientes c, usuarios u
+WHERE c.codigo_sn = 'C000000011'
+AND u.usuario = 'alexander.menjivar' LIMIT 1;
+
+-- Boleta 2 — Revisada — Alexander — hace 8 días
+INSERT INTO reportes (
+  numero_llamada, numero_proyecto, cliente_id, cliente_nombre,
+  tecnico_nombre, tipo_servicio, trabajo_realizado, estado_servicio,
+  hora_entrada, hora_salida, observaciones, hay_cotizacion,
+  validado, estado_revision, es_reproceso, supervisor_nombre,
+  supervisor_id, fecha, created_at, revisado_at, tiempo_revision_minutos
+)
+SELECT '9901', '7001',
+  c.id, c.nombre_comercial,
+  'Douglas Alexander Carranza Cruz', ARRAY['Cableado'],
+  'Tendido de fibra óptica entre edificio principal y bodega central. Se instalaron 150 metros de fibra monomodo y se probó enlace con OTDR.',
+  'Terminado', '06:00', '14:00',
+  'Enlace funcionando a velocidad nominal.',
+  false, true, 'revisada', false,
+  u.nombre, u.id,
+  current_date - 8, now() - interval '8 days',
+  now() - interval '7 days 20 hours', 18
+FROM clientes c, usuarios u
+WHERE c.codigo_sn = 'C000000011'
+AND u.usuario = 'alexander.menjivar' LIMIT 1;
+
+-- Boleta 3 — PENDIENTE REVISION — Alexander — hace 23 horas — CON COTIZACION
+INSERT INTO reportes (
+  numero_llamada, numero_proyecto, cliente_id, cliente_nombre,
+  tecnico_nombre, tipo_servicio, trabajo_realizado, estado_servicio,
+  hora_entrada, hora_salida, observaciones, hay_cotizacion,
+  descripcion_cotizacion, validado, estado_revision, es_reproceso,
+  supervisor_nombre, supervisor_id, fecha, created_at
+)
+SELECT '9901', '7001',
+  c.id, c.nombre_comercial,
+  'Carlos Enrique Perez Beltran', ARRAY['Configuraciones'],
+  'Configuración de NVR principal 32 canales. Se configuraron todas las cámaras instaladas por el subcontrato y se estableció grabación continua 24/7.',
+  'Terminado', '07:00', '13:00',
+  'Gerente de logística solicitó acceso remoto desde su oficina.',
+  true,
+  'Sistema de monitoreo remoto completo — pantallas, servidor y software de gestión centralizada.',
+  true, 'pendiente_revision', false,
+  u.nombre, u.id,
+  current_date - 1, now() - interval '23 hours'
+FROM clientes c, usuarios u
+WHERE c.codigo_sn = 'C000000011'
+AND u.usuario = 'alexander.menjivar' LIMIT 1;
+
+-- LLAMADA 9902 — ALAS DORADAS — Sixto Pacas
+-- Cliente CON correo: comprasadsa@alas-doradas.com
+
+-- Boleta 4 — SIN NUMERO DE LLAMADA — Sixto — hace 2 días
+INSERT INTO reportes (
+  numero_llamada, numero_proyecto, cliente_id, cliente_nombre,
+  tecnico_nombre, tipo_servicio, trabajo_realizado, estado_servicio,
+  hora_entrada, hora_salida, observaciones, hay_cotizacion,
+  validado, estado_revision, es_reproceso, supervisor_nombre,
+  supervisor_id, fecha, created_at
+)
+SELECT NULL, NULL,
+  c.id, c.nombre_comercial,
+  'Andres Eduardo Torres Perez', ARRAY['Mantenimiento'],
+  'Mantenimiento preventivo al sistema de alarma en planta de producción. Se revisaron 24 zonas, se reemplazaron 3 sensores dañados y se verificó comunicación con central de monitoreo.',
+  'Terminado', '08:00', '11:30',
+  'Jefe de planta solicitó reporte detallado del estado de todas las zonas.',
+  false, true, 'pendiente_revision', false,
+  u.nombre, u.id,
+  current_date - 2, now() - interval '2 days'
+FROM clientes c, usuarios u
+WHERE c.codigo_sn = 'C000000028'
+AND u.usuario = 'sixto.pacas' LIMIT 1;
+
+-- Boleta 5 — CON REPROCESO — Sixto — hace 26 horas
+INSERT INTO reportes (
+  numero_llamada, numero_proyecto, cliente_id, cliente_nombre,
+  tecnico_nombre, tipo_servicio, trabajo_realizado, estado_servicio,
+  hora_entrada, hora_salida, observaciones, hay_cotizacion,
+  validado, estado_revision, es_reproceso, supervisor_nombre,
+  supervisor_id, fecha, created_at
+)
+SELECT '9902', '7002',
+  c.id, c.nombre_comercial,
+  'Jonatan Abisai Rojas Guzman', ARRAY['Soporte'],
+  'Soporte al sistema de control de acceso en área administrativa. Se reiniciaron 2 lectores con falla intermitente y se actualizó base de datos de usuarios.',
+  'En proceso', '09:00', '11:00',
+  'Quedan 2 lectores del área de bodega pendientes de revisión.',
+  false, true, 'pendiente_revision', true,
+  u.nombre, u.id,
+  current_date - 1, now() - interval '26 hours'
+FROM clientes c, usuarios u
+WHERE c.codigo_sn = 'C000000028'
+AND u.usuario = 'sixto.pacas' LIMIT 1;
+
+-- Boleta 6 — Revisada — Sixto — hace 5 días — CON COTIZACION PENDIENTE
+INSERT INTO reportes (
+  numero_llamada, numero_proyecto, cliente_id, cliente_nombre,
+  tecnico_nombre, tipo_servicio, trabajo_realizado, estado_servicio,
+  hora_entrada, hora_salida, observaciones, hay_cotizacion,
+  descripcion_cotizacion, validado, estado_revision, es_reproceso,
+  cotizacion_estado, supervisor_nombre, supervisor_id,
+  fecha, created_at, revisado_at, tiempo_revision_minutos
+)
+SELECT '9902', '7002',
+  c.id, c.nombre_comercial,
+  'Felix Eduardo Ramirez Pineda', ARRAY['Instalación'],
+  'Instalación de sistema de alarma contra incendios en bodega principal. 12 detectores de humo y 3 sirenas instalados.',
+  'Terminado', '07:00', '14:00',
+  'Gerente solicitó certificado de instalación para auditoría.',
+  true, 'Mantenimiento anual del sistema instalado bajo contrato de servicio.',
+  true, 'revisada', false, 'pendiente',
+  u.nombre, u.id,
+  current_date - 5, now() - interval '5 days',
+  now() - interval '4 days 21 hours', 45
+FROM clientes c, usuarios u
+WHERE c.codigo_sn = 'C000000028'
+AND u.usuario = 'sixto.pacas' LIMIT 1;
+
+-- LLAMADA 9903 — CROWLEY LOGISTICS — Edgardo Mena
+-- Cliente CON correo: facturasv@crowley.com
+
+-- Boleta 7 — SIN NUMERO LLAMADA — CON COTIZACION — Edgardo — hace 4 horas
+INSERT INTO reportes (
+  numero_llamada, numero_proyecto, cliente_id, cliente_nombre,
+  tecnico_nombre, tipo_servicio, trabajo_realizado, estado_servicio,
+  hora_entrada, hora_salida, observaciones, hay_cotizacion,
+  descripcion_cotizacion, validado, estado_revision, es_reproceso,
+  supervisor_nombre, supervisor_id, fecha, created_at
+)
+SELECT NULL, NULL,
+  c.id, c.nombre_comercial,
+  'Heriberto Esteban Vasquez Canenguez', ARRAY['Instalación','Cableado'],
+  'Instalación de 3 torniquetes de acceso con lector QR en entrada principal de las instalaciones. Se integró con el sistema de control de acceso existente.',
+  'Terminado', '07:00', '15:00',
+  'Gerente de operaciones solicitó cotización para acceso secundario.',
+  true,
+  'Instalación de 2 torniquetes adicionales en acceso secundario de la bodega.',
+  true, 'pendiente_revision', false,
+  u.nombre, u.id,
+  current_date, now() - interval '4 hours'
+FROM clientes c, usuarios u
+WHERE c.codigo_sn = 'C000000068'
+AND u.usuario = 'edgardo.mena' LIMIT 1;
+
+-- Boleta 8 — Revisada con cotizacion ENVIADA — Edgardo
+INSERT INTO reportes (
+  numero_llamada, numero_proyecto, cliente_id, cliente_nombre,
+  tecnico_nombre, tipo_servicio, trabajo_realizado, estado_servicio,
+  hora_entrada, hora_salida, observaciones, hay_cotizacion,
+  descripcion_cotizacion, validado, estado_revision, es_reproceso,
+  cotizacion_estado, cotizacion_vendedor, cotizacion_enviada_at,
+  correo_comercial_enviado_at, supervisor_nombre, supervisor_id,
+  fecha, created_at, revisado_at, tiempo_revision_minutos
+)
+SELECT '9903', '7003',
+  c.id, c.nombre_comercial,
+  'Edwin Alejandro Marquin Segura', ARRAY['Mantenimiento'],
+  'Mantenimiento preventivo al sistema de videovigilancia en oficinas centrales. 18 cámaras revisadas, firmware actualizado y grabación verificada.',
+  'Terminado', '08:00', '11:00',
+  'Director de IT solicitó expansión del sistema al área de carga.',
+  true, 'Instalación de 6 cámaras adicionales en área de carga y descarga.',
+  true, 'revisada', false,
+  'enviada', 'Allen Rosales', now() - interval '3 days',
+  now() - interval '3 days',
+  u.nombre, u.id,
+  current_date - 5, now() - interval '5 days',
+  now() - interval '4 days 18 hours', 35
+FROM clientes c, usuarios u
+WHERE c.codigo_sn = 'C000000068'
+AND u.usuario = 'edgardo.mena' LIMIT 1;
+
+-- CONDOMINIO COSTA REAL — SIN CORREO EN BASE
+-- Boleta 9 — Revisada — Alexander — hace 3 días — REPROCESO
+INSERT INTO reportes (
+  numero_llamada, numero_proyecto, cliente_id, cliente_nombre,
+  tecnico_nombre, tipo_servicio, trabajo_realizado, estado_servicio,
+  hora_entrada, hora_salida, observaciones, hay_cotizacion,
+  validado, estado_revision, es_reproceso, supervisor_nombre,
+  supervisor_id, fecha, created_at, revisado_at, tiempo_revision_minutos
+)
+SELECT '9904', '7004',
+  c.id, c.nombre_comercial,
+  'Jonatan Abisai Rojas Guzman', ARRAY['Reparación'],
+  'Reparación de barrera vehicular dañada en acceso principal. Se reemplazó motor y se ajustaron sensores de posición.',
+  'Terminado', '06:00', '09:00',
+  'Segunda visita por falla recurrente en el mismo motor.',
+  false, true, 'revisada', true,
+  u.nombre, u.id,
+  current_date - 3, now() - interval '3 days',
+  now() - interval '2 days 20 hours', 55
+FROM clientes c, usuarios u
+WHERE c.codigo_sn = 'C000000067'
+AND u.usuario = 'alexander.menjivar' LIMIT 1;
+
+-- ASOCIACION COMUNAL PORTAL DEL CASCO NORTE — CON CORREO
+-- Boleta 10 — Revisada — Sixto — hace 7 días — CON COTIZACION PENDIENTE
+INSERT INTO reportes (
+  numero_llamada, numero_proyecto, cliente_id, cliente_nombre,
+  tecnico_nombre, tipo_servicio, trabajo_realizado, estado_servicio,
+  hora_entrada, hora_salida, observaciones, hay_cotizacion,
+  descripcion_cotizacion, validado, estado_revision, es_reproceso,
+  cotizacion_estado, supervisor_nombre, supervisor_id,
+  fecha, created_at, revisado_at, tiempo_revision_minutos
+)
+SELECT '9905', '7005',
+  c.id, c.nombre_comercial,
+  'Alexander Emilio Menjivar Melara', ARRAY['Instalación'],
+  'Instalación de sistema de alarma comunitaria en acceso principal del condominio. 8 sensores de movimiento y 2 sirenas instalados.',
+  'Terminado', '07:00', '11:00',
+  'Presidente de la asociación solicitó mantenimiento preventivo anual.',
+  true, 'Contrato de mantenimiento anual del sistema de alarma.',
+  true, 'revisada', false, 'pendiente',
+  u.nombre, u.id,
+  current_date - 7, now() - interval '7 days',
+  now() - interval '6 days 22 hours', 22
+FROM clientes c, usuarios u
+WHERE c.codigo_sn = 'C000000009'
+AND u.usuario = 'sixto.pacas' LIMIT 1;
+
+-- CONDOMINIO PUERTA LA PALMA — CON CORREO
+-- Boleta 11 — HOY — pendiente revision — Sixto Pacas
+INSERT INTO reportes (
+  numero_llamada, numero_proyecto, cliente_id, cliente_nombre,
+  tecnico_nombre, tipo_servicio, trabajo_realizado, estado_servicio,
+  hora_entrada, hora_salida, observaciones, hay_cotizacion,
+  validado, estado_revision, es_reproceso, supervisor_nombre,
+  supervisor_id, fecha, created_at
+)
+SELECT '9906', '7006',
+  c.id, c.nombre_comercial,
+  'Carlos Enrique Perez Beltran', ARRAY['Reparación'],
+  'Reparación de cámara PTZ dañada en área de piscina. Motor horizontal reemplazado y ángulo de visión calibrado.',
+  'Terminado', '09:00', '10:30',
+  'Sistema funcionando al 100% después de la reparación.',
+  false, true, 'pendiente_revision', false,
+  u.nombre, u.id,
+  current_date, now() - interval '2 hours'
+FROM clientes c, usuarios u
+WHERE c.codigo_sn = 'C000000052'
+AND u.usuario = 'sixto.pacas' LIMIT 1;
+
+-- APCE KINDER HORIZONTES — SIN CORREO (irá a experiencia al cliente)
+-- Boleta 12 — Edgardo — revisada
+INSERT INTO reportes (
+  numero_llamada, numero_proyecto, cliente_id, cliente_nombre,
+  tecnico_nombre, tipo_servicio, trabajo_realizado, estado_servicio,
+  hora_entrada, hora_salida, observaciones, hay_cotizacion,
+  validado, estado_revision, es_reproceso, supervisor_nombre,
+  supervisor_id, fecha, created_at, revisado_at, tiempo_revision_minutos
+)
+SELECT '9907', '7007',
+  c.id, c.nombre_comercial,
+  'Selvin Rudilbar Rivera Ramirez', ARRAY['Soporte'],
+  'Soporte al sistema de videovigilancia. Se reiniciaron 3 cámaras con parpadeo intermitente y se actualizó firmware del NVR.',
+  'Terminado', '10:00', '11:30',
+  'Director del kinder solicitó revisión semestral programada.',
+  false, true, 'revisada', false,
+  u.nombre, u.id,
+  current_date - 4, now() - interval '4 days',
+  now() - interval '3 days 21 hours', 15
+FROM clientes c, usuarios u
+WHERE c.codigo_sn = 'C000000007'
+AND u.usuario = 'edgardo.mena' LIMIT 1;
+
+-- ============================================================
+-- REPUESTOS
+-- ============================================================
+INSERT INTO reporte_repuestos (reporte_id, cantidad, descripcion)
+SELECT r.id, 3, 'Sensor de movimiento PIR doble tecnología Bosch'
+FROM reportes r
+WHERE r.numero_llamada = '9902'
+AND r.tecnico_nombre = 'Jonatan Abisai Rojas Guzman' LIMIT 1;
+
+INSERT INTO reporte_repuestos (reporte_id, cantidad, descripcion)
+SELECT r.id, 1, 'Motor barrera vehicular 24V Faac'
+FROM reportes r WHERE r.numero_llamada = '9904' LIMIT 1;
+
+INSERT INTO reporte_repuestos (reporte_id, cantidad, descripcion)
+SELECT r.id, 1, 'Motor PTZ horizontal Hikvision'
+FROM reportes r WHERE r.numero_llamada = '9906' LIMIT 1;
+
+INSERT INTO reporte_repuestos (reporte_id, cantidad, descripcion)
+SELECT r.id, 12, 'Detector de humo Bosch D280'
+FROM reportes r WHERE r.numero_llamada = '9902'
+AND r.tecnico_nombre = 'Felix Eduardo Ramirez Pineda' LIMIT 1;
+
+INSERT INTO reporte_repuestos (reporte_id, cantidad, descripcion)
+SELECT r.id, 3, 'Sirena de evacuación 110dB'
+FROM reportes r WHERE r.numero_llamada = '9902'
+AND r.tecnico_nombre = 'Felix Eduardo Ramirez Pineda' LIMIT 1;
+
+INSERT INTO reporte_repuestos (reporte_id, cantidad, descripcion)
+SELECT r.id, 3, 'Torniquete tripod con lector QR Hikvision'
+FROM reportes r WHERE r.cliente_nombre = 'CROWLEY LOGISTICS EL SALVADOR S.A DE C.V'
+AND r.numero_llamada IS NULL LIMIT 1;
+
+-- ============================================================
+-- TÉCNICOS AUXILIARES
+-- ============================================================
+INSERT INTO reporte_tecnicos (reporte_id, nombre, hora_entrada, hora_salida, es_subcontrato, es_principal)
+SELECT r.id, 'Andres Eduardo Torres Perez', '06:00', '14:00', false, false
+FROM reportes r
+WHERE r.numero_llamada = '9901'
+AND r.tecnico_nombre = 'Douglas Alexander Carranza Cruz' LIMIT 1;
+
+INSERT INTO reporte_tecnicos (reporte_id, nombre, hora_entrada, hora_salida, es_subcontrato, es_principal)
+SELECT r.id, 'Jonatan Abisai Rojas Guzman', '07:00', '13:00', false, false
+FROM reportes r
+WHERE r.numero_llamada = '9901'
+AND r.tecnico_nombre = 'Carlos Enrique Perez Beltran' LIMIT 1;
+
+INSERT INTO reporte_tecnicos (reporte_id, nombre, hora_entrada, hora_salida, es_subcontrato, es_principal)
+SELECT r.id, 'Douglas Alexander Carranza Cruz', '07:00', '14:00', false, false
+FROM reportes r
+WHERE r.numero_llamada = '9902'
+AND r.tecnico_nombre = 'Felix Eduardo Ramirez Pineda' LIMIT 1;
